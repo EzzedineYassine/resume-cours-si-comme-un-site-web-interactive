@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cours & Terminal Interactif — Sécurité Informatique (Chapitre 1 - FSEGN)</title>
+  <style>
+    :root {
+      --bg-main: #0b1120;
+      --bg-card: #111827;
+      --bg-card-alt: #1e293b;
+      --bg-term: #090d16;
+      --border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-dark: #0284c7;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --violet: #a855f7;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 310px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .brand {
+      padding: 1.25rem 1.25rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    }
+
+    .brand-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      margin-bottom: 0.5rem;
+    }
+
+    .brand h1 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .brand p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .nav-section-title {
+      padding: 0.85rem 1.1rem 0.4rem;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding: 0 0.65rem;
+    }
+
+    .nav-btn {
+      text-align: left;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      padding: 0.55rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.84rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+    }
+
+    .nav-btn.active {
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.35);
+      font-weight: 600;
+    }
+
+    .slide-num-pill {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.3rem;
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      min-width: 2.1rem;
+      text-align: center;
+    }
+
+    .nav-btn.active .slide-num-pill {
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    /* Main Content Area */
+    .main-wrapper {
+      margin-left: 310px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 440px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.55rem 0.9rem;
+      border-radius: 0.5rem;
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: var(--bg-card-alt);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.9rem;
+      border-radius: 0.5rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent-dark);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #0369a1;
+      color: #fff;
+    }
+
+    .btn-emerald {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .btn-emerald:hover {
+      background: rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+    }
+
+    .content-container {
+      padding: 1.75rem 2rem 4rem;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Interactive Split Layout: Slide + Live Terminal */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1120px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        max-height: 320px;
+      }
+      body {
+        flex-direction: column;
+      }
+      .main-wrapper {
+        margin-left: 0;
+      }
+    }
+
+    /* Cards & Slide Content */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.85rem;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+    }
+
+    .slide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .slide-badge {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 0.4rem;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .slide-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .section-box {
+      border-radius: 0.65rem;
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+    }
+
+    .box-slide-official {
+      background: rgba(30, 41, 59, 0.75);
+      border-left: 4px solid var(--accent);
+    }
+
+    .box-prof-explain {
+      background: rgba(16, 185, 129, 0.07);
+      border-left: 4px solid var(--emerald);
+    }
+
+    .box-trap {
+      background: rgba(244, 63, 94, 0.08);
+      border-left: 4px solid var(--rose);
+    }
+
+    .box-exercise {
+      background: rgba(168, 85, 247, 0.08);
+      border-left: 4px solid var(--violet);
+    }
+
+    .box-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.55rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .label-blue { color: var(--accent); }
+    .label-green { color: #34d399; }
+    .label-red { color: #fb7185; }
+    .label-purple { color: #c084fc; }
+
+    ul.clean-list {
+      padding-left: 1.2rem;
+      margin-top: 0.4rem;
+    }
+
+    ul.clean-list li {
+      margin-bottom: 0.4rem;
+      color: #e2e8f0;
+      font-size: 0.93rem;
+    }
+
+    code.inline-code {
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: #38bdf8;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.3rem;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    pre.code-block {
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 0.55rem;
+      padding: 0.9rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.83rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      margin: 0.65rem 0;
+      line-height: 1.5;
+    }
+
+    /* Interactive Linux Terminal */
+    .terminal-panel {
+      position: sticky;
+      top: 4.5rem;
+      background: var(--bg-term);
+      border: 1px solid #334155;
+      border-radius: 0.85rem;
+      overflow: hidden;
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .term-header {
+      background: #1e293b;
+      padding: 0.65rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+    }
+
+    .term-dots {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .term-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .term-title {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .term-body {
+      padding: 1rem;
+      height: 430px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+
+    .term-line {
+      margin-bottom: 0.45rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .term-prompt-str {
+      color: #10b981;
+      font-weight: 700;
+    }
+
+    .term-cmd-str {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .term-output-str {
+      color: #cbd5e1;
+    }
+
+    .term-explain-str {
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 3px solid #f59e0b;
+      padding: 0.45rem 0.65rem;
+      margin-top: 0.35rem;
+      border-radius: 0.25rem;
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+    }
+
+    .term-input-row {
+      display: flex;
+      align-items: center;
+      background: #0f172a;
+      border-top: 1px solid #334155;
+      padding: 0.6rem 0.85rem;
+      gap: 0.5rem;
+    }
+
+    .term-input-row span {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #10b981;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .term-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .quick-cmds {
+      background: #111827;
+      border-top: 1px solid #1e293b;
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .chip-cmd {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      background: #1e293b;
+      color: #93c5fd;
+      border: 1px solid #334155;
+      padding: 0.22rem 0.5rem;
+      border-radius: 0.35rem;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .chip-cmd:hover {
+      background: var(--accent-dark);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Solution Toggle Box */
+    .solution-box {
+      display: none;
+      margin-top: 0.75rem;
+      padding: 0.9rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 0.5rem;
+    }
+
+    .solution-box.open {
+      display: block;
+    }
+
+    /* Chmod Calculator Widget */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .calc-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .calc-col {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      padding: 0.85rem;
+      border-radius: 0.6rem;
+    }
+
+    .calc-col h4 {
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .calc-col label {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.83rem;
+      margin-bottom: 0.35rem;
+      cursor: pointer;
+    }
+
+    /* Tables */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.86rem;
+    }
+
+    table.data-table th,
+    table.data-table td {
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+    }
+
+    table.data-table th {
+      background: #1e293b;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    table.data-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-badge">FSEGN • Sécurité SI</span>
+      <h1>Chapitre 1 : Sécurité Informatique</h1>
+      <p>Support du Prof. Anis NAANAA (23 Slides) + Corrigés DS & Terminal Linux</p>
+    </div>
+
+    <div class="nav-section-title">Modes d'étude</div>
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="switchMode('slides')" id="mode-slides-btn">
+        <span class="slide-num-pill">23</span> Cours Slide par Slide (1→23)
+      </button>
+      <button class="nav-btn" onclick="switchMode('all-slides')" id="mode-all-btn">
+        <span class="slide-num-pill">ALL</span> Vue Complète des 23 Slides
+      </button>
+      <button class="nav-btn" onclick="switchMode('chmod-calc')" id="mode-calc-btn">
+        <span class="slide-num-pill">777</span> Calculateur Permissions & SUID
+      </button>
+      <button class="nav-btn" onclick="switchMode('ds-2026')" id="mode-ds26-btn">
+        <span class="slide-num-pill">DS1</span> Devoir Surveillé 2025-2026 (L-EB2)
+      </button>
+      <button class="nav-btn" onclick="switchMode('ds-2024')" id="mode-ds24-btn">
+        <span class="slide-num-pill">DS2</span> Devoir Surveillé 2023-2024 (L-BI3)
+      </button>
+    </div>
+
+    <div class="nav-section-title">Navigation directe (23 Slides)</div>
+    <div class="nav-tabs" id="slide-nav-list"></div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="search-box">
+        <input type="text" id="global-search" placeholder="Rechercher une notion ou commande (ex: GRUB, SUID, tcpdump, chattr, netstat...)" oninput="filterSlides(this.value)" />
+      </div>
+      <div class="top-actions">
+        <button class="btn" onclick="prevSlide()">◀ Slide Précédente</button>
+        <button class="btn btn-primary" onclick="nextSlide()">Slide Suivante ▶</button>
+        <button class="btn btn-emerald" onclick="switchMode('all-slides')">Afficher tout le cours</button>
+      </div>
+    </header>
+
+    <main class="content-container">
+      <div class="workspace-grid">
+        <!-- LEFT COLUMN: DYNAMIC VIEW -->
+        <div id="left-panel"></div>
+
+        <!-- RIGHT COLUMN: INTERACTIVE LINUX TERMINAL -->
+        <div class="terminal-panel">
+          <div class="term-header">
+            <div class="term-dots">
+              <div class="term-dot dot-red"></div>
+              <div class="term-dot dot-yellow"></div>
+              <div class="term-dot dot-green"></div>
+            </div>
+            <div class="term-title">root@fsegn-sec-lab:~# (Terminal Interactif d'Entraînement)</div>
+            <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem;" onclick="clearTerminal()">Effacer</button>
+          </div>
+
+          <div class="term-body" id="term-output">
+            <div class="term-line"><span class="term-prompt-str">Système Linux FSEGN Lab v2.6 prêt.</span></div>
+            <div class="term-line">Tape une commande d'examen (ex: <code class="inline-code">find / -perm /4000</code>, <code class="inline-code">chmod 4532 file</code>, <code class="inline-code">netstat -tunap</code>, <code class="inline-code">lsof -i :8080</code>, <code class="inline-code">chattr +i /etc/passwd</code>, <code class="inline-code">help</code>) ou clique sur <b>« Exécuter dans le terminal »</b> dans un exercice !</div>
+          </div>
+
+          <form class="term-input-row" onsubmit="handleTerminalSubmit(event)">
+            <span>root@fsegn-sec:~#</span>
+            <input type="text" id="term-input" class="term-input" placeholder="Tape ta commande Linux ici puis Entrée..." autocomplete="off" />
+            <button type="submit" class="btn btn-primary" style="padding:0.3rem 0.65rem; font-size:0.76rem;">Exécuter</button>
+          </form>
+
+          <div class="quick-cmds">
+            <span style="font-size:0.72rem; color:#94a3b8; width:100%; margin-bottom:0.15rem;">Commandes rapides (clique pour tester) :</span>
+            <button class="chip-cmd" onclick="runCommand('grub-mkpasswd-pbkdf2')">grub-mkpasswd-pbkdf2</button>
+            <button class="chip-cmd" onclick="runCommand('find / -type f -perm /4000 2>/dev/null')">find SUID (/4000)</button>
+            <button class="chip-cmd" onclick="runCommand('chmod 4532 file')">chmod 4532 file</button>
+            <button class="chip-cmd" onclick="runCommand('chattr +i /etc/passwd')">chattr +i /etc/passwd</button>
+            <button class="chip-cmd" onclick="runCommand('netstat -tunap')">netstat -tunap</button>
+            <button class="chip-cmd" onclick="runCommand('lsof -i :8080')">lsof -i :8080</button>
+            <button class="chip-cmd" onclick="runCommand('nmap -sS 192.168.1.10')">nmap -sS</button>
+            <button class="chip-cmd" onclick="runCommand('tcpdump -i eth0 port 443 -w /tmp/tcpdump')">tcpdump HTTPS</button>
+            <button class="chip-cmd" onclick="runCommand('tail -f /var/log/auth.log')">tail auth.log</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // =========================================================================
+    // BASE DE DONNÉES COMPLÈTE DES 23 SLIDES DU COURS + EXERCICES CORRIGÉS
+    // =========================================================================
+    const slidesData = [
+      {
+        num: 1,
+        title: "Page de garde : Introduction à la sécurité informatique",
+        official: [
+          "Chapitre 1 : Introduction à la sécurité informatique",
+          "Enseignant : Anis NAANAA",
+          "Faculté des Sciences Économiques et de Gestion de Nabeul (FSEGN) — Département d'Informatique et Méthodes Quantitatives"
+        ],
+        profExplain: "Ce premier chapitre pose toutes les bases de l'administration système sécurisée sous Linux (Ubuntu/Debian). À l'examen (Devoir Surveillé), 100 % des questions portent sur : (1) les concepts fondamentaux (Confidentialité, Intégrité, Disponibilité, Authentification, Cryptographie vs Hachage), (2) la protection du démarrage (BIOS/UEFI, LILO, GRUB, Multiboot), (3) les droits Unix classiques et spéciaux (SUID, SGID, Sticky Bit, find, chattr), (4) le diagnostic réseau/processus (netstat, nmap, tcpdump, lsof, ps) et (5) la gestion des comptes et fichiers PAM (/etc/sudoers, limits.conf, access.conf, time.conf).",
+        trap: "Ne révise pas seulement les définitions théoriques : la moitié des points du devoir (8 à 10 points sur 20) consiste à écrire ou interpréter des commandes Linux exactes avec leurs options !",
+        exerciseQ: "Quelle commande Linux permet de vérifier rapidement sur quelle version du noyau et du système tu travailles avant de commencer un audit de sécurité ?",
+        exerciseCmd: "uname -a",
+        exerciseAns: "La commande `uname -a` affiche le nom du noyau (Linux), le nom d'hôte, la version exacte du kernel et l'architecture matérielle (x86_64). À distance sur une cible réseau, on utilise `nmap -O <IP>`."
+      },
+      {
+        num: 2,
+        title: "Sommaire et architecture du Chapitre 1",
+        official: [
+          "1. Introduction à la sécurité informatique & 2. Sécurisation des accès physiques",
+          "3. Protection par BIOS/UEFI & 4. Protection des chargeurs de démarrage (LILO, GRUB)",
+          "5. Le multiboot & 6. Droits d'accès basiques (chmod, chown, chgrp)",
+          "7. Droits d'accès avancés (SUID, SGID, Sticky Bit, find, lsattr, chattr)",
+          "8. Commandes de diagnostic (Outils de collecte) & 9. Fichiers de journalisation (logs)",
+          "10. Failles applicatives, 11. Sécurité des utilisateurs, 12. Sécurité des fichiers & 13. Conclusion"
+        ],
+        profExplain: "Remarque la logique du cours : il suit l'ordre chronologique d'une attaque ou du démarrage d'une machine ! On part du boîtier physique (salle serveur) → carte mère (BIOS/UEFI) → chargeur de démarrage (LILO/GRUB) → partitions (Multiboot) → système de fichiers (chmod, SUID, chattr) → réseau et processus (nmap, netstat, tcpdump, lsof) → logs (/var/log) → applications (SQLi, XSS) → utilisateurs et PAM (sudoers, limits.conf).",
+        trap: "Beaucoup d'étudiants confondent la sécurité au démarrage (GRUB/BIOS) et la sécurité des sessions ouvertes (PAM/sudoers). Retiens toujours à quelle couche chaque outil agit.",
+        exerciseQ: "Cite dans l'ordre les 4 étapes du démarrage d'un serveur Linux qu'un administrateur doit sécuriser.",
+        exerciseCmd: "[ -d /sys/firmware/efi ] && echo \"UEFI\" || echo \"BIOS\"",
+        exerciseAns: "1) L'accès physique au serveur, 2) Le firmware BIOS/UEFI (mot de passe + Secure Boot), 3) Le chargeur de démarrage GRUB (mot de passe PBKDF2), 4) Le montage des partitions et le noyau Linux."
+      },
+      {
+        num: 3,
+        title: "Concepts fondamentaux : Triade CID & Menaces",
+        official: [
+          "Définition : Protection des systèmes informatiques contre l'accès non autorisé, la modification ou la destruction des données.",
+          "Objectifs principaux : Confidentialité (contre la divulgation), Intégrité (contre la modification non autorisée), Disponibilité (assurance de l'accès aux ressources).",
+          "Types de menaces : Accès non autorisé, Logiciels malveillants, Déni de service (DoS), Ingénierie sociale.",
+          "Exemple réel : Un système bancaire doit garantir la confidentialité des transactions, l'intégrité des soldes et la disponibilité des services."
+        ],
+        profExplain: "En plus de la triade CID (Confidentialité, Intégrité, Disponibilité), le professeur demande systématiquement à la Question 1 du DS de définir l'Authentification (vérifier l'identité d'un utilisateur avant l'accès) et de distinguer la Cryptographie (réversible avec une clé, assure la confidentialité, ex: AES, RSA) du Hachage (irréversible sans clé, assure l'intégrité et protège les mots de passe, ex: SHA-256, MD5, PBKDF2).",
+        trap: "Ne dis jamais qu'on « décrypte un hash » ! Le hachage (SHA-256, MD5) est à sens unique (irréversible). On compare deux empreintes (hashes), tandis qu'on chiffre et déchiffre avec un algorithme cryptographique (AES, RSA).",
+        exerciseQ: "Question 1 & 2 du DS : Comment vérifier l'intégrité d'un fichier critique comme /etc/passwd sous Linux grâce au hachage ?",
+        exerciseCmd: "sha256sum /etc/passwd",
+        exerciseAns: "On calcule son empreinte cryptographique avec `sha256sum /etc/passwd` (ou `md5sum`) et on la compare à l'empreinte de référence enregistrée lors de l'installation (ou via l'outil AIDE). Si un seul caractère du fichier change, le hash change complètement."
+      },
+      {
+        num: 4,
+        title: "Importance de la sécurité physique",
+        official: [
+          "Pourquoi sécuriser l'accès physique ? Premier niveau de défense, empêche le vol de matériel, prévention contre l'accès direct aux données, protection contre le boot sur périphériques externes.",
+          "Mesures : Serrures et contrôles d'accès, surveillance vidéo, armoires et racks sécurisés, contrôle d'accès biométrique, journalisation des entrées/sorties.",
+          "Risques (si accès physique) : Voler des données directement, installer des dispositifs d'écoute (keylogger matériel), démarrer sur un OS alternatif (Live USB), voler le matériel."
+        ],
+        profExplain: "Pourquoi un attaquant qui a un accès physique de 2 minutes à un serveur non protégé peut-il contourner tous les mots de passe Linux ? Parce qu'il peut brancher une clé Live USB Linux, démarrer dessus, monter la partition racine `/` du disque dur non chiffré et modifier directement `/etc/shadow` ou copier les bases de données.",
+        trap: "Un pare-feu (firewall) ou un mot de passe root de 30 caractères ne protège absolument pas contre quelqu'un qui démonte le disque dur ou démarre sur une clé USB si le disque n'est pas chiffré (LUKS) et le BIOS verrouillé !",
+        exerciseQ: "Quels sont les deux réglages matériels/système indispensables pour empêcher un attaquant ayant accès au clavier de lire le disque via une clé Live USB ?",
+        exerciseCmd: "lsblk -f",
+        exerciseAns: "1) Verrouiller le BIOS/UEFI par mot de passe en désactivant le boot sur USB et en plaçant le disque dur en premier dans l'ordre de boot. 2) Chiffrer les partitions sensibles du disque dur (ex: avec LUKS/dm-crypt)."
+      },
+      {
+        num: 5,
+        title: "Sécurisation du firmware : BIOS vs UEFI",
+        official: [
+          "BIOS : Basic Input/Output System (ancien).",
+          "UEFI : Unified Extensible Firmware Interface (moderne).",
+          "Mesures de sécurité : Mot de passe BIOS/UEFI (empêche la modification des paramètres), Secure Boot (empêche le chargement d'OS non signés), Désactivation des ports (USB, DVD), Ordre de boot sécurisé (disque dur en premier).",
+          "Configuration sous Ubuntu : touches F2, F10, Del ou Esc au démarrage. Vérification du mode de boot : `[ -d /sys/firmware/efi ] && echo \"UEFI\" || echo \"BIOS\"`"
+        ],
+        profExplain: "Le Secure Boot est l'avantage majeur de l'UEFI sur l'ancien BIOS : la carte mère possède des clés cryptographiques et refuse de lancer un chargeur de démarrage (GRUB) ou un noyau qui n'est pas numériquement signé. Cela bloque les rootkits de boot (bootkits). Dans le terminal Linux, la présence du répertoire `/sys/firmware/efi` prouve que le système tourne en mode UEFI.",
+        trap: "Retiens la syntaxe exacte du test bash de la slide 5 : `[ -d /sys/firmware/efi ]` teste si `/sys/firmware/efi` est un répertoire (`-d` = directory).",
+        exerciseQ: "Exécute la commande du cours pour vérifier si la machine a démarré en mode UEFI ou BIOS.",
+        exerciseCmd: "[ -d /sys/firmware/efi ] && echo \"UEFI\" || echo \"BIOS\"",
+        exerciseAns: "La commande vérifie l'existence du dossier `/sys/firmware/efi`. S'il existe (`&&`), elle affiche `UEFI` ; sinon (`||`), elle affiche `BIOS`."
+      },
+      {
+        num: 6,
+        title: "LILO : Linux Loader (Ancien chargeur de démarrage)",
+        official: [
+          "Caractéristiques : Ancien chargeur de démarrage pour Linux, configuration via `/etc/lilo.conf`, moins flexible que GRUB, nécessite de relancer `lilo` après modification.",
+          "Sécurisation de LILO dans `/etc/lilo.conf` : `password=\"monMotDePasse\"` et `restricted`.",
+          "Application des modifications : `sudo lilo`.",
+          "Attention : LILO est obsolète et rarement utilisé dans les distributions modernes."
+        ],
+        profExplain: "Dans `/etc/lilo.conf`, l'option `password=\"monMotDePasse\"` définit un mot de passe. L'option `restricted` est très importante : elle permet à la machine de redémarrer toute seule normalement sans demander le mot de passe, MAIS exige le mot de passe si quelqu'un essaie de passer des paramètres au noyau au démarrage (comme `linux single` ou `init=/bin/bash`). Comme le mot de passe est écrit en clair dans `/etc/lilo.conf`, il faut aussi faire `chmod 600 /etc/lilo.conf` !",
+        trap: "Sous LILO, modifier `/etc/lilo.conf` ne suffit pas : si tu oublies d'exécuter `sudo lilo` après, la modification n'est pas écrite dans le secteur de boot (MBR).",
+        exerciseQ: "Quelle commande faut-il obligatoirement lancer après avoir ajouté `password` et `restricted` dans `/etc/lilo.conf` ?",
+        exerciseCmd: "sudo lilo",
+        exerciseAns: "Il faut exécuter `sudo lilo` pour réécrire le secteur d'amorçage avec la nouvelle configuration."
+      },
+      {
+        num: 7,
+        title: "GRUB : Chargeur de démarrage moderne",
+        official: [
+          "Caractéristiques : Chargeur de démarrage le plus répandu, supporte de nombreux systèmes de fichiers, interface interactive, configuration finale dans `/boot/grub/grub.cfg`.",
+          "Sécurisation de GRUB :",
+          "1) Génération de mot de passe haché : `grub-mkpasswd-pbkdf2`",
+          "2) Configuration dans `/etc/grub.d/40_custom` : `set superusers=\"admin\"` et `password_pbkdf2 admin grub.pbkdf2.sha512.10000.[hash]`",
+          "3) Mise à jour de GRUB : `sudo update-grub`"
+        ],
+        profExplain: "C'est l'une des questions préférées du professeur (présente dans les deux DS !). Pourquoi GRUB est-il dangereux par défaut ? Parce que son menu est interactif : en appuyant sur `e` au démarrage, un attaquant peut modifier la ligne du kernel pour lancer `/bin/bash` en root sans mot de passe. On ne modifie jamais `/boot/grub/grub.cfg` directement car il est écrasé à chaque mise à jour : on met la configuration dans `/etc/grub.d/40_custom` puis on lance `sudo update-grub`.",
+        trap: "Question 5 du DS 2023-2024 : « Donner la syntaxe de la commande qui permet de crypter (hacher) le mot de passe du GRUB » → ne te trompe pas sur les tirets : c'est `grub-mkpasswd-pbkdf2` !",
+        exerciseQ: "Génère un mot de passe haché pour GRUB dans le terminal, puis mets à jour la configuration GRUB.",
+        exerciseCmd: "grub-mkpasswd-pbkdf2",
+        exerciseAns: "1) `grub-mkpasswd-pbkdf2` génère le hash PBKDF2-SHA512. 2) On colle `set superusers=\"admin\"` et `password_pbkdf2 admin <hash>` dans `/etc/grub.d/40_custom`. 3) On applique avec `sudo update-grub`."
+      },
+      {
+        num: 8,
+        title: "Le Multiboot : Gestion des systèmes multiples",
+        official: [
+          "Définition : Installation de plusieurs systèmes d'exploitation sur une même machine.",
+          "Risques de sécurité : Accès aux données depuis un autre OS, contournement des politiques de sécurité, modification du chargeur de démarrage.",
+          "Mesures de protection : Chiffrement des partitions sensibles, mot de passe BIOS/UEFI, sécurisation de GRUB, séparation physique des disques.",
+          "Exemple de partitionnement sécurisé (`/etc/fstab`) : `/dev/sda1` (`/boot`), `/dev/sda2` (`/`), `/dev/sda3` (`/home`), `/dev/sda4` (`swap`)."
+        ],
+        profExplain: "Question 4 du DS 2023-2024 : « Pourquoi est-il déconseillé d'utiliser le multi-boot dans le cas des serveurs et des Data Centers ? » Il y a 3 raisons majeures : 1) Confidentialité/Intégrité : si un OS secondaire est démarré, il peut monter les partitions non chiffrées du premier OS et lire/modifier tous les fichiers en ignorant les droits Unix. 2) Intégrité du boot : l'autre OS peut écraser GRUB. 3) Disponibilité : un serveur en Data Center doit assurer ses services 24h/24 ; en multiboot, un seul OS fonctionne à la fois (on utilise donc des machines virtuelles / hyperviseurs et jamais du multiboot).",
+        trap: "Séparer `/boot`, `/` et `/home` sur des partitions distinctes (`sda1`, `sda2`, `sda3`) permet aussi d'éviter qu'un utilisateur qui remplit `/home` ne bloque tout le système racine `/` (déni de service par saturation disque).",
+        exerciseQ: "Affiche la table de partitionnement sécurisé `/etc/fstab` dans le terminal pour voir comment `/boot`, `/` et `/home` sont isolés.",
+        exerciseCmd: "cat /etc/fstab",
+        exerciseAns: "Chaque répertoire critique (`/boot`, `/`, `/home`, `swap`) possède sa propre partition dédiée (`/dev/sda1` à `/dev/sda4`), que l'on peut chiffrer avec LUKS pour empêcher tout accès depuis un autre OS en multiboot."
+      },
+      {
+        num: 9,
+        title: "Gestion des permissions basiques (chmod, chown, chgrp)",
+        official: [
+          "Commandes fondamentales :",
+          "• `chmod` : change les permissions d'un fichier",
+          "• `chown` : change le propriétaire d'un fichier",
+          "• `chgrp` : change le groupe d'un fichier"
+        ],
+        profExplain: "Sous Linux, chaque fichier possède un propriétaire (User) et un groupe (Group). Seul `root` (ou le propriétaire pour certains droits) peut modifier ces attributs. Avec `chown`, tu peux changer à la fois le propriétaire et le groupe en une seule commande grâce à la syntaxe `sudo chown alice:devs rapport.txt` (ou utiliser `chgrp devs rapport.txt` uniquement pour le groupe).",
+        trap: "Ne confonds pas `chmod` (qui change les droits `rwx`) et `chown` (qui change à qui appartient le fichier).",
+        exerciseQ: "Comment donner la propriété du fichier `config.php` à l'utilisateur `www-data` et au groupe `www-data` ?",
+        exerciseCmd: "chown www-data:www-data config.php",
+        exerciseAns: "La commande `chown www-data:www-data config.php` attribue simultanément le propriétaire `www-data` et le groupe `www-data` au fichier."
+      },
+      {
+        num: 10,
+        title: "Comprendre les permissions Unix & Notation octale",
+        official: [
+          "Structure des permissions : User (`u` = propriétaire), Group (`g` = groupe), Others (`o` = autres utilisateurs).",
+          "Types de permissions : `r` (read / lecture = 4), `w` (write / écriture = 2), `x` (execute / exécution = 1).",
+          "Exemples de notation octale :",
+          "• `777` : `rwxrwxrwx` (tous droits pour tous)",
+          "• `755` : `rwxr-xr-x` (propriétaire : tous, autres : lecture/exécution)",
+          "• `644` : `rw-r--r--` (propriétaire : lecture/écriture, autres : lecture)",
+          "• `600` : `rw-------` (seulement le propriétaire)"
+        ],
+        profExplain: "Pour convertir entre octal et symbolique sans jamais te tromper, décompose chaque chiffre en somme de `4 (r) + 2 (w) + 1 (x)` :\n• `7` = 4+2+1 (`rwx`)\n• `6` = 4+2 (`rw-`)\n• `5` = 4+1 (`r-x`)\n• `4` = 4 (`r--`)\n• `3` = 2+1 (`-wx`)\n• `2` = 2 (`-w-`)\n• `1` = 1 (`--x`)\n• `0` = `---`.",
+        trap: "Sur un répertoire, le droit `x` (exécution = 1) signifie « droit de traverser le dossier (`cd`) ». Sans `x` sur un dossier, même si tu as `r`, tu ne peux pas entrer dedans !",
+        exerciseQ: "Que donne la commande `chmod 640 secret.txt` en notation symbolique et qui peut lire ce fichier ?",
+        exerciseCmd: "chmod 640 secret.txt",
+        exerciseAns: "`640` correspond à `-rw-r-----` : le propriétaire (`6`) peut lire et écrire (`rw-`), les membres du groupe (`4`) peuvent uniquement lire (`r--`), et les autres utilisateurs (`0`) n'ont aucun droit (`---`)."
+      },
+      {
+        num: 11,
+        title: "Permissions spéciales : SUID, SGID et Sticky Bit",
+        official: [
+          "SUID (Set User ID - octal 4000) : Le programme s'exécute avec les droits du propriétaire. Représenté par `s` dans la permission user (`-rwsr-xr-x`). Exemple : `/usr/bin/passwd`.",
+          "SGID (Set Group ID - octal 2000) : Le programme s'exécute avec les droits du groupe. Sur un dossier, les fichiers créés héritent du groupe parent. Représenté par `s` dans group.",
+          "Sticky Bit (octal 1000) : Seul le propriétaire peut supprimer/renommer son fichier. Utilisé pour les répertoires partagés (`/tmp`). Représenté par `t` dans others (`drwxrwxrwt`)."
+        ],
+        profExplain: "C'est un sujet incontournable des DS (Question 3 complète du DS 2025-2026 + exercices `chmod 4532` et `find / -perm`).\n• Pourquoi `/usr/bin/passwd` a-t-il besoin du SUID ? Parce qu'un simple étudiant doit pouvoir changer son propre mot de passe, or les mots de passe sont stockés dans `/etc/shadow` qui n'est modifiable QUE par `root`. Grâce au SUID sur `/usr/bin/passwd`, pendant l'exécution de `passwd`, le programme tourne avec les droits de son propriétaire (`root`).\n• Pourquoi un binaire SUID root mal géré est-il très dangereux ? Si on met le SUID sur un éditeur (`vim`, `nano`), un shell (`bash`) ou un binaire vulnérable à un buffer overflow, n'importe quel utilisateur devient immédiatement `root` !",
+        trap: "Attention aux majuscules `S` et `T` dans `ls -l` ! Si le propriétaire n'a pas le droit `x` (ex: `chmod 4644`), Linux affiche `-rwSr--r--` (`S` majuscule = SUID sans `x`). S'il a le droit `x` (ex: `chmod 4755` ou `4532`), Linux affiche `-rwsr-xr-x` (`s` minuscule = SUID + `x`).",
+        exerciseQ: "Exercice 1 (Question 7 du DS 2025-2026) : Interprète précisément la commande `chmod 4532 file`.",
+        exerciseCmd: "chmod 4532 file",
+        exerciseAns: "Le premier chiffre `4` active le bit spécial SUID. Le 2e chiffre `5` (4+1) donne Lecture + Exécution (`r-x` → `r-s` avec SUID) au propriétaire. Le 3e chiffre `3` (2+1) donne Écriture + Exécution (`-wx`) au groupe. Le 4e chiffre `2` donne Écriture seule (`-w-`) aux autres. Résultat `ls -l` : `-r-s-wx-w-`."
+      },
+      {
+        num: 12,
+        title: "Configuration et vérification des permissions spéciales",
+        official: [
+          "Configuration avec `chmod` : notation octale (`chmod 4755`, `chmod 2775`, `chmod 1777`) ou symbolique (`chmod u+s`, `chmod g+s`, `chmod +t`).",
+          "Vérification avec `ls -l /usr/bin/passwd` → `-rwsr-xr-x 1 root root 63960 Feb 7 2020 /usr/bin/passwd`",
+          "Vérification avec `ls -ld /tmp` → `drwxrwxrwt 10 root root 4096 Nov 15 10:30 /tmp`"
+        ],
+        profExplain: "Observe bien la commande `ls -ld /tmp` : pourquoi utilise-t-on l'option `-d` ? Parce que `ls -l /tmp` listerait les fichiers *à l'intérieur* de `/tmp`, alors que `ls -ld /tmp` affiche les permissions du dossier `/tmp` lui-même (`drwxrwxrwt`, qui correspond à `1777` : `1` pour le Sticky Bit `t` à la fin, et `777` pour `rwxrwxrwx`).",
+        trap: "Si on te demande au devoir comment activer le Sticky Bit sur un dossier `/partage`, tu peux écrire `chmod +t /partage` ou `chmod 1777 /partage`.",
+        exerciseQ: "Vérifie dans le terminal les permissions exactes de `/usr/bin/passwd` et de `/tmp`.",
+        exerciseCmd: "ls -l /usr/bin/passwd",
+        exerciseAns: "`ls -l /usr/bin/passwd` affiche `-rwsr-xr-x` (le `s` dans la 4e colonne indique le SUID root). `ls -ld /tmp` affiche `drwxrwxrwt` (le `t` final indique le Sticky Bit)."
+      },
+      {
+        num: 13,
+        title: "Outils de gestion avancée : find, chattr et lsattr",
+        official: [
+          "Recherche avec `find` :",
+          "• Fichiers avec SUID : `find / -type f -perm /4000 2>/dev/null`",
+          "• Fichiers avec SGID : `find / -type f -perm /2000 2>/dev/null`",
+          "• Fichiers SUID appartenant à root : `find / -user root -perm -4000 2>/dev/null`",
+          "• Fichiers modifiables par tous : `find / -perm -o=w ! -type l 2>/dev/null`",
+          "Attributs étendus (`chattr` / `lsattr`) :",
+          "• Rendre un fichier immuable (même par root) : `chattr +i fichier_important.conf`",
+          "• Ajouter l'attribut append-only : `chattr +a fichier_log.log`",
+          "• Lister les attributs : `lsattr fichier_important.conf`"
+        ],
+        profExplain: "Cette slide tombe à CHAQUE examen (Questions 4, 5, 11 et Exercice 1 Q2 & Q8 du DS 2025-2026, et Exercice Q9 du DS 2023-2024) !\n1) Avec `find -perm` :\n• `find / -perm 3210` (sans `/` ni `-` devant le nombre) cherche la permission EXACTE `3210` (SGID 2 + Sticky 1 = 3, User = 2 `w`, Group = 1 `x`, Others = 0).\n• `find / -perm /4000` (ou `-4000`) cherche les fichiers ayant le bit SUID (4000) activé.\n• `find / -perm +6000` (ou `/6000`) cherche les fichiers ayant SUID (4000) OU SGID (2000) activé (4000 + 2000 = 6000).\n2) Avec `chattr` :\n• `+i` (immutable) : bloque toute suppression, modification ou renommage, même par `root`.\n• `-i` : retire l'attribut immuable.\n• `+a` (append-only) : autorise uniquement l'ajout de lignes à la fin (parfait pour protéger `/var/log/auth.log` contre un pirate qui voudrait effacer ses traces).",
+        trap: "N'oublie jamais la différence entre `chattr +i file` (verrouille le fichier) et `chattr -i file` (déverrouille le fichier — c'est la question 8 de l'exercice du DS 2025-2026 !).",
+        exerciseQ: "Teste la commande `find / -type f -perm /4000 2>/dev/null` pour lister les binaires SUID du système.",
+        exerciseCmd: "find / -type f -perm /4000 2>/dev/null",
+        exerciseAns: "La commande parcourt toute l'arborescence depuis `/`, filtre les fichiers réguliers (`-type f`) ayant le bit SUID (`4000`) activé, et masque les erreurs d'accès avec `2>/dev/null`."
+      },
+      {
+        num: 14,
+        title: "Outils réseau essentiels (ping, ip, netstat, nmap, tcpdump, netcat)",
+        official: [
+          "Diagnostic réseau : `ping` (test de connectivité), `ifconfig`/`ip` (configuration interfaces), `netstat`/`ss` (statistiques réseau et connexions), `nmap` (analyse de ports et réseau), `tcpdump` (analyseur de paquets), `netcat` (couteau suisse réseau).",
+          "Exemples du cours :",
+          "• `ping -c 4 google.com`",
+          "• `ip addr show` et `ip route show`",
+          "• `ss -tulnp` et `netstat -tuln`",
+          "• `nmap -sS 192.168.1.0/24`",
+          "• `tcpdump -i eth0 -w capture.pcap`"
+        ],
+        profExplain: "Voici comment décoder toutes les options qui tombent aux deux DS :\n• `netstat` : `-t` (TCP), `-u` (UDP), `-l` (Listening / en écoute), `-a` (All / toutes les connexions actives et en écoute), `-n` (Numérique : affiche `443` au lieu de `https`), `-p` (Processus/PID), `-i` (statistiques par interface), `-s` (statistiques globales par protocole).\n• `nmap` : `-sS` = scan furtif TCP SYN (envoie SYN, attend SYN/ACK, puis coupe avec RST sans finir la connexion) ; `-sP` = Ping Scan (cherche juste quelles machines sont allumées sur le réseau, ex: `nmap -sP 192.168.1.*`).\n• `tcpdump` : `-i eth0` (interface), `-w fichier` (enregistre les paquets bruts), `-r fichier` (lit un fichier de capture existant).",
+        trap: "Piège classique du DS 2023-2024 : `netstat -tuna | grep https` ! Comme l'option `-n` force l'affichage numérique des ports (`443`), le mot `https` n'apparaît pas dans la sortie et `grep https` ne trouve rien ! Il faut soit enlever `-n`, soit faire `grep :443`.",
+        exerciseQ: "Question 6 du DS 2025-2026 : Donne la commande `netstat` qui affiche toutes les connexions réseau actives (TCP et UDP) et les processus qui les utilisent.",
+        exerciseCmd: "netstat -tunap",
+        exerciseAns: "`sudo netstat -tunap` combine `-t` (TCP), `-u` (UDP), `-n` (numérique), `-a` (toutes les connexions actives) et `-p` (affiche le PID et le nom du processus)."
+      },
+      {
+        num: 15,
+        title: "Outils système et processus (ps, lsof, chage, top/htop)",
+        official: [
+          "Monitoring système :",
+          "• `ps` : information sur les processus (`ps -aux | grep ...`)",
+          "• `lsof` : list open files (liste les fichiers et sockets ouverts par les processus)",
+          "• `chage` : gestion de l'expiration des mots de passe",
+          "• `top` / `htop` : monitoring en temps réel"
+        ],
+        profExplain: "Trois commandes d'examen à maîtriser ici :\n1) `ps -aux | grep docker` (ou `grep proftpd`) : liste tous les processus de tous les utilisateurs et filtre ceux qui correspondent au service recherché.\n2) `lsof` (Questions 9 & 10 du DS 2025-2026) : sous Linux, tout est fichier (même une connexion réseau !).\n   - Pour voir tous les fichiers ouverts par un processus suspect : `lsof -p <PID>` ou `lsof -c <nom>`.\n   - Pour savoir quel processus écoute sur le port 8080 : `sudo lsof -i :8080`.\n3) `chage -l username` : affiche la date d'expiration du mot de passe d'un utilisateur.",
+        trap: "N'oublie pas les deux-points `:` devant le numéro de port dans `lsof -i :8080` !",
+        exerciseQ: "Question 10 du DS 2025-2026 : Utilise `lsof` dans le terminal pour identifier quel processus écoute sur le port 8080.",
+        exerciseCmd: "lsof -i :8080",
+        exerciseAns: "La commande `sudo lsof -i :8080` interroge la table des descripteurs réseau ouverts et renvoie le nom de la commande, le PID et l'utilisateur qui occupe le port TCP/UDP 8080."
+      },
+      {
+        num: 16,
+        title: "Système de logs (journalisation) sous Linux",
+        official: [
+          "Répertoire principal : `/var/log/` — contient tous les fichiers de journalisation.",
+          "Fichiers de log importants : `auth.log` / `secure` (authentification et sécurité), `syslog` (messages système généraux), `kern.log` (messages du noyau), `apache2`/`nginx` (serveurs web), `dpkg.log` (installation de paquets), `boot.log` (démarrage).",
+          "Outils d'analyse :",
+          "• `tail -f /var/log/auth.log` et `less /var/log/syslog`",
+          "• `grep \"Failed password\" /var/log/auth.log` et `grep \"Accepted\" /var/log/auth.log`",
+          "• `journalctl -xe` et `journalctl -u ssh.service --since \"2023-11-15\"`"
+        ],
+        profExplain: "En cas de tentative d'intrusion SSH par force brute (Brute Force), c'est dans `/var/log/auth.log` que tout est enregistré. La commande `tail -f /var/log/auth.log` permet de voir les nouvelles lignes s'afficher en direct (`-f` = follow). Pour empêcher un attaquant devenu root d'effacer ses traces dans `/var/log/auth.log`, on applique l'attribut append-only : `sudo chattr +a /var/log/auth.log`.",
+        trap: "Retiens bien que `grep \"Failed password\" /var/log/auth.log` repère les échecs d'authentification (tentatives d'attaque), tandis que `grep \"Accepted\" /var/log/auth.log` montre les connexions réussies.",
+        exerciseQ: "Recherche dans `/var/log/auth.log` toutes les tentatives de connexion échouées (attaque Brute Force SSH).",
+        exerciseCmd: "grep \"Failed password\" /var/log/auth.log",
+        exerciseAns: "La commande filtre `/var/log/auth.log` et affiche chaque tentative de mot de passe ratée avec la date, le compte ciblé et l'adresse IP de l'attaquant."
+      },
+      {
+        num: 17,
+        title: "Types de failles applicatives courantes & Injection SQL",
+        official: [
+          "Failles courantes : Buffer overflow (dépassement de mémoire), Injection SQL (manipulation de BDD), XSS / Cross-Site Scripting (injection de scripts), CSRF / Cross-Site Request Forgery (requêtes forgées), Race conditions (conditions de concurrence), Insecure deserialization.",
+          "Exemple réel (Injection SQL) :",
+          "Code vulnérable : `query = \"SELECT * FROM users WHERE username = '\" + username + \"'\"`",
+          "Injection : `' OR '1'='1' --` → Requête résultante : `SELECT * FROM users WHERE username = '' OR '1'='1'`",
+          "Prévention : Validation des entrées, Requêtes paramétrées, Principe du moindre privilège, Mises à jour régulières."
+        ],
+        profExplain: "Comprends bien le mécanisme de l'Injection SQL de la slide 17 : le développeur a concaténé directement la variable `username` dans la chaîne SQL. En tapant `' OR '1'='1' --`, l'attaquant ferme l'apostrophe, ajoute la condition toujours vraie `OR '1'='1'`, et met `--` pour mettre en commentaire le reste de la requête (comme la vérification du mot de passe !). La solution définitive est d'utiliser des **requêtes préparées / paramétrées** (Prepared Statements).",
+        trap: "Ne confonds pas XSS et CSRF : dans **XSS**, l'attaquant injecte du JavaScript qui s'exécute dans le navigateur de la victime ; dans **CSRF**, l'attaquant fait envoyer par le navigateur d'une victime déjà connectée une action non désirée vers le serveur.",
+        exerciseQ: "Quelle est la mesure technique principale qui bloque à 100 % une Injection SQL dans le code source d'une application ?",
+        exerciseCmd: "echo \"SELECT * FROM users WHERE username = ?\"",
+        exerciseAns: "L'utilisation de **requêtes paramétrées (requêtes préparées / Prepared Statements)** associée à la validation systématique des entrées utilisateur."
+      },
+      {
+        num: 18,
+        title: "Gestion sécurisée des utilisateurs (+ .rhosts, rlogin, rsh)",
+        official: [
+          "Bonnes pratiques : Mots de passe forts, Principe du moindre privilège, Désactiver les comptes inutilisés, Rotation régulière des mots de passe, Audit régulier des comptes.",
+          "Commandes de gestion :",
+          "• Ajouter : `sudo useradd -m -s /bin/bash username` puis `sudo passwd username`",
+          "• Modifier : `sudo usermod -aG sudo username` (ajouter aux sudoers), `sudo usermod -L username` (verrouiller le compte)",
+          "• Supprimer : `sudo userdel -r username`",
+          "• Vérifier : `getent passwd` et `lastlog`"
+        ],
+        profExplain: "Détail des options :\n• `useradd -m -s /bin/bash user` : `-m` crée le répertoire personnel `/home/user`, `-s` définit `/bin/bash` comme shell.\n• `usermod -aG sudo user` : `-aG` ajoute (`append`) l'utilisateur au groupe secondaire `sudo` sans écraser ses autres groupes.\n• `usermod -L user` : verrouille (`Lock`) le compte en plaçant un `!` devant le hash du mot de passe dans `/etc/shadow`.\n• **Rappel spécial DS 2023-2024 (`.rhosts`, `rlogin`, `rsh`)** : le fichier `~/.rhosts` autorise des machines/utilisateurs distants à se connecter sans mot de passe via les anciens protocoles non chiffrés `rlogin` (`rlogin -l test linux` ouvre une session avec le compte `test` sur `linux`) et `rsh` (`rsh linux ps` exécute `ps` à distance sur `linux`). Il doit être banni et remplacé par SSH.",
+        trap: "Si tu fais `usermod -G sudo user` sans le `-a`, l'utilisateur perd tous ses autres groupes secondaires ! Utilise toujours `-aG`.",
+        exerciseQ: "Verrouille le compte de l'utilisateur `stagiaire` sans supprimer ses fichiers, puis vérifie la liste des dernières connexions.",
+        exerciseCmd: "sudo usermod -L stagiaire",
+        exerciseAns: "`sudo usermod -L stagiaire` désactive immédiatement la connexion par mot de passe du compte, et `lastlog` permet de vérifier quand chaque compte s'est connecté pour la dernière fois."
+      },
+      {
+        num: 19,
+        title: "Configuration de sécurité PAM & /etc/security/limits.conf",
+        official: [
+          "Fichiers de configuration importants :",
+          "• `/etc/security/access.conf` : contrôle d'accès par utilisateur/groupe",
+          "• `/etc/security/group.conf` : mapping des groupes",
+          "• `/etc/security/limits.conf` : limites système par utilisateur",
+          "• `/etc/security/time.conf` : restrictions temporelles",
+          "• `/etc/sudoers` : configuration des privilèges sudo",
+          "Exemple `/etc/security/limits.conf` :",
+          "`username hard nproc 100` / `username soft nproc 50` (limiter le nombre de processus)",
+          "`@group hard rss 1024000` (limiter la mémoire RAM)",
+          "`* hard nofile 4096` (limiter les fichiers ouverts pour tous `*`)"
+        ],
+        profExplain: "Pourquoi `/etc/security/limits.conf` est-il essentiel pour la **Disponibilité** ? Si un utilisateur exécute accidentellement ou malveillamment une *Fork Bomb* (`:(){ :|:& };:` qui crée des processus à l'infini), le serveur plante. En limitant `nproc` (nombre de processus) à `50` (limite `soft` = avertissement) et `100` (limite `hard` = plafond strict infranchissable), seul le compte de l'utilisateur est bloqué et le serveur reste disponible ! Note que `@group` commence par `@` pour désigner un groupe, et `*` désigne tous les utilisateurs.",
+        trap: "Retiens la différence entre `soft` (limite souple que l'utilisateur peut augmenter temporairement jusqu'à la limite hard) et `hard` (plafond strict fixé par `root`).",
+        exerciseQ: "Affiche le contenu de `/etc/security/limits.conf` dans le terminal et explique la ligne `* hard nofile 4096`.",
+        exerciseCmd: "cat /etc/security/limits.conf",
+        exerciseAns: "La ligne `* hard nofile 4096` impose à tous les utilisateurs du système (`*`, sauf root) un plafond strict (`hard`) de 4096 fichiers ouverts simultanément (`nofile`)."
+      },
+      {
+        num: 20,
+        title: "Configuration sudo avancée (/etc/sudoers & visudo)",
+        official: [
+          "Syntaxe de base `/etc/sudoers` : `user host=(runas) command`",
+          "Exemples :",
+          "• `john ALL=(ALL) ALL`",
+          "• `admin ALL=(ALL) NOPASSWD: ALL`",
+          "• `webadmin ALL=(www-data) /etc/init.d/apache2 *`",
+          "Alias : `User_Alias ADMINS = john, admin, root`, `Host_Alias WEBSERVERS = 192.168.1.10, 192.168.1.11`, `Cmnd_Alias WEB_CMDS = /etc/init.d/apache2, /etc/init.d/nginx` → `ADMINS WEBSERVERS=(www-data) WEB_CMDS`",
+          "Attention : Toujours utiliser `visudo` pour modifier `/etc/sudoers` pour éviter les erreurs de syntaxe."
+        ],
+        profExplain: "Comment lire `webadmin ALL=(www-data) /etc/init.d/apache2 *` ?\n• `webadmin` (qui ?) sur `ALL` (depuis n'importe quelle machine hôte) peut exécuter en tant que `(www-data)` (quel compte cible ?) uniquement la commande `/etc/init.d/apache2 *`. C'est l'application parfaite du **principe du moindre privilège** !\n• Pourquoi `visudo` est-il obligatoire ? Parce que `visudo` vérifie la syntaxe du fichier avant d'enregistrer : si tu édites `/etc/sudoers` avec `nano` et que tu fais une faute de frappe, la commande `sudo` est cassée pour tout le monde !",
+        trap: "Attention à l'ordre dans `user host=(runas) command` : le premier `ALL` dans `john ALL=(ALL) ALL` est le nom de la machine (`host`), le `(ALL)` entre parenthèses est l'utilisateur cible (`runas`), et le dernier `ALL` représente les commandes.",
+        exerciseQ: "Quelle commande sécurisée dois-tu lancer pour éditer `/etc/sudoers` et vérifier sa syntaxe ?",
+        exerciseCmd: "sudo visudo",
+        exerciseAns: "`sudo visudo` ouvre `/etc/sudoers` dans un éditeur sécurisé, verrouille le fichier contre les modifications simultanées et refuse d'enregistrer s'il détecte une erreur de syntaxe."
+      },
+      {
+        num: 21,
+        title: "Configuration d'accès (/etc/security/access.conf) et temps (time.conf)",
+        official: [
+          "`/etc/security/access.conf` (format `permission : utilisateurs : origines`) :",
+          "`+ : root : ALL`",
+          "`+ : admin : 192.168.1.0/24`",
+          "`+ : users : .example.com`",
+          "`- : ALL : ALL`",
+          "Restrictions par terminal : `+ : admin : tty1 tty2` puis `- : ALL : ALL`",
+          "`/etc/security/time.conf` (format `services;terminaux;utilisateurs;horaires`) :",
+          "`sshd;*;users;!Wd0000-2400`",
+          "`sshd;*;admin;Wd0900-1700`",
+          "Exemple : `sshd;*;*;!Wd0000-2400`"
+        ],
+        profExplain: "Ces deux fichiers PAM permettent un contrôle contextuel très fin :\n1) Dans `access.conf`, les règles sont lues dans l'ordre : on autorise (`+`) d'abord les cas légitimes (ex: `admin` depuis le sous-réseau `192.168.1.0/24` ou uniquement sur les consoles physiques `tty1 tty2`), et on termine toujours par `- : ALL : ALL` pour bloquer tout le reste.\n2) Dans `time.conf`, les4 champs sont séparés par des points-virgules `;` : `service ; tty ; user ; time`. `Wd` signifie *Weekdays* (lundi à vendredi) et `Wk` signifie *Weekend* (samedi-dimanche). Le point d'exclamation `!` signifie la négation (interdit pendant cette plage). Ainsi `sshd;*;admin;Wd0900-1700` autorise `admin` en SSH uniquement du lundi au vendredi de 09h00 à 17h00.",
+        trap: "N'oublie jamais la règle finale `- : ALL : ALL` dans `access.conf`, sinon tout ce qui n'est pas mentionné reste autorisé par défaut !",
+        exerciseQ: "Inspecte `/etc/security/access.conf` et `/etc/security/time.conf` dans le terminal.",
+        exerciseCmd: "cat /etc/security/access.conf",
+        exerciseAns: "Dans `access.conf`, `+` autorise et `-` interdit selon l'origine (IP, domaine ou terminal `tty`). Dans `time.conf`, on restreint un service comme `sshd` selon les jours et heures."
+      },
+      {
+        num: 22,
+        title: "Récapitulatif des bonnes pratiques : Sécurité multi-niveaux",
+        official: [
+          "Sécurité multi-niveaux (Défense en profondeur) :",
+          "• Physique : contrôle d'accès, BIOS sécurisé",
+          "• Système : permissions, audits, monitoring",
+          "• Réseau : firewall, détection d'intrusion",
+          "• Application : validation, patching, configuration",
+          "• Utilisateurs : formation, politiques, authentification",
+          "Contrôles réguliers : Audit des permissions et privilèges, revue des logs et activités suspectes, mise à jour régulière, tests de pénétration et vulnérabilités, sauvegardes et plan de reprise.",
+          "Rappel important : La sécurité est un processus continu, pas un état final."
+        ],
+        profExplain: "Ce principe s'appelle la **Défense en profondeur (Defense in Depth)** : si une couche cède (par exemple une faille applicative est exploitée), la couche suivante (les permissions système restreintes, `limits.conf`, `chattr +i` et le pare-feu) bloque l'attaquant et l'empêche de compromettre tout le serveur.",
+        trap: "Dans une question de synthèse, cite toujours les 5 couches (Physique, Système, Réseau, Application, Utilisateurs) + la sauvegarde/plan de reprise d'activité (PRA).",
+        exerciseQ: "Quelle commande permet de vérifier rapidement tous les comptes utilisateurs présents sur le système lors d'un audit ?",
+        exerciseCmd: "getent passwd",
+        exerciseAns: "`getent passwd` interroge la base des comptes (locale `/etc/passwd` et annuaires réseau) pour lister tous les utilisateurs, leurs UID/GID, leurs répertoires personnels et leurs shells."
+      },
+      {
+        num: 23,
+        title: "Références, ressources et outils recommandés (Lynis, ClamAV, Fail2ban, UFW, AIDE)",
+        official: [
+          "Documentation : `man [commande]`, Ubuntu (`help.ubuntu.com`), GRUB (`gnu.org/software/grub`), Sudo (`sudo.ws`).",
+          "Ressources en ligne : CIS Benchmarks, OWASP Top 10, Linux Security Documentation.",
+          "Outils recommandés :",
+          "• Lynis : audit de sécurité",
+          "• ClamAV : antivirus",
+          "• Fail2ban : protection contre les bruteforce",
+          "• UFW : firewall simple",
+          "• AIDE : détection d'intégrité des fichiers"
+        ],
+        profExplain: "Retiens le rôle exact des 5 outils de la slide 23 car ils servent d'exemples parfaits dans les questions de cours :\n• **AIDE** (*Advanced Intrusion Detection Environment*) : répond directement à la Question 4a du DS 2025-2026 (vérifier qu'un fichier critique comme `/etc/passwd` n'a pas été altéré grâce à une base de données d'empreintes/hashes).\n• **Fail2ban** : surveille `/var/log/auth.log` et bloque automatiquement par firewall les adresses IP qui échouent plusieurs fois leur mot de passe SSH.\n• **Lynis** : scanne la machine Linux pour vérifier si GRUB, SSH, les permissions et PAM sont bien configurés.",
+        trap: "Ne confonds pas **AIDE** (vérification d'intégrité des fichiers locaux) et **Fail2ban** (blocage réseau des attaques par force brute dans les logs).",
+        exerciseQ: "Quel outil de la slide 23 utiliserais-tu pour vérifier automatiquement si `/etc/passwd` ou `/bin/login` a été modifié par un pirate ?",
+        exerciseCmd: "aide --check",
+        exerciseAns: "On utilise **AIDE** (`aide --check`), complété par `sha256sum /etc/passwd` et la protection préventive `chattr +i /etc/passwd`."
+      }
+    ];
+
+    // =========================================================================
+    // DONNÉES DES DEUX DEVOIRS SURVEILLÉS (2025-2026 & 2023-2024)
+    // =========================================================================
+    const ds2026Questions = [
+      {
+        q: "1. Décrire les méthodes suivantes : Authentification, Confidentialité et Intégrité.",
+        a: "• Authentification : vérifier et prouver l'identité légitime d'un utilisateur ou d'un système avant de lui accorder l'accès (ex: mot de passe, clé SSH, biométrie).\n• Confidentialité : garantir que les données ne sont accessibles en lecture qu'aux personnes autorisées (via le chiffrement AES/RSA/TLS et les permissions).\n• Intégrité : garantir que les données n'ont subi aucune modification ou altération non autorisée, accidentelle ou malveillante (via le hachage SHA-256, AIDE, chattr +i).",
+        cmd: "sha256sum /etc/passwd"
+      },
+      {
+        q: "2. a) Expliquez le rôle de GRUB dans le processus de démarrage de Linux. b) Décrivez deux mesures de sécurité pour protéger GRUB.",
+        a: "a) GRUB (GRand Unified Bootloader) est le chargeur de démarrage exécuté après le BIOS/UEFI : il permet de choisir l'OS, charge le noyau Linux (kernel) en RAM et lui passe les paramètres d'initialisation.\nb) Mesure 1 : Définir un superutilisateur (`set superusers=\"admin\"`) et un mot de passe haché PBKDF2 (`grub-mkpasswd-pbkdf2`) dans `/etc/grub.d/40_custom` puis appliquer avec `sudo update-grub` pour bloquer l'édition des options de boot (touche `e`).\nMesure 2 : Restreindre les permissions de `/boot/grub/grub.cfg` (`chmod 600`, propriétaire `root`), activer le Secure Boot UEFI et mettre un mot de passe BIOS/UEFI.",
+        cmd: "grub-mkpasswd-pbkdf2"
+      },
+      {
+        q: "3. Expliquez les concepts SUID, SGID et Sticky Bit : a) Rôle et signification, b) Exemple légitime pour chacun, c) Pourquoi un binaire SUID mal géré est un risque majeur.",
+        a: "a) SUID (4000, `s` sur user) : exécute un binaire avec les droits de son propriétaire. SGID (2000, `s` sur group) : exécute avec les droits du groupe ou fait hériter du groupe parent aux fichiers créés dans un dossier. Sticky Bit (1000, `t` sur others) : dans un dossier partagé, seul le propriétaire d'un fichier (ou root) peut le supprimer/renommer.\nb) Exemples : SUID → `/usr/bin/passwd` ; SGID → dossier partagé d'équipe `/projet` ; Sticky Bit → `/tmp` (`drwxrwxrwt`).\nc) Risque SUID : si un binaire appartenant à `root` a le bit SUID et contient une faille (buffer overflow) ou permet d'ouvrir un shell/modifier des fichiers (`bash`, `vim`, `find`), n'importe quel utilisateur non privilégié obtient immédiatement les droits `root` (élévation de privilèges).",
+        cmd: "ls -l /usr/bin/passwd"
+      },
+      {
+        q: "4. Comment assurer l'intégrité d'un fichier critique comme /etc/passwd ? a) Vérifier qu'il n'a pas été altéré. b) Protéger contre toute modification avec la commande spécifique.",
+        a: "a) Calculer et comparer son empreinte cryptographique avec une référence sûre via `sha256sum /etc/passwd` (ou `md5sum`), utiliser l'outil de contrôle d'intégrité `AIDE`, et vérifier sa date de modification (`stat /etc/passwd`).\nb) Appliquer les permissions minimales (`chmod 644 /etc/passwd`, `chown root:root`) et activer l'attribut d'immuabilité avec `sudo chattr +i /etc/passwd` (empêche toute modification/suppression même par root).",
+        cmd: "chattr +i /etc/passwd"
+      },
+      {
+        q: "5. Donnez la commande find qui permettrait de trouver tous les fichiers du système de fichiers racine (/) ayant le bit SUID activé.",
+        a: "`find / -type f -perm /4000 2>/dev/null` (ou `find / -perm -4000 2>/dev/null`).",
+        cmd: "find / -type f -perm /4000 2>/dev/null"
+      },
+      {
+        q: "6. Donnez la commande netstat qui permettrait d'afficher toutes les connexions réseau actives (TCP et UDP) et les processus qui les utilisent.",
+        a: "`sudo netstat -tunap` (`-t` = TCP, `-u` = UDP, `-n` = adresses numériques, `-a` = toutes les connexions actives/écoute, `-p` = processus/PID).",
+        cmd: "netstat -tunap"
+      },
+      {
+        q: "7. Donnez une commande tcpdump pour capturer tout le trafic réseau sur l'interface eth0 et l'enregistrer dans un fichier.",
+        a: "`sudo tcpdump -i eth0 -w capture.pcap`",
+        cmd: "tcpdump -i eth0 -w capture.pcap"
+      },
+      {
+        q: "8. Comment peut-on afficher la version du système cible ?",
+        a: "• En local sur le système : `uname -a`, `lsb_release -a` ou `cat /etc/os-release`.\n• À distance sur une cible réseau : `sudo nmap -O <IP_cible>` (détection de l'OS par fingerprinting TCP/IP).",
+        cmd: "uname -a"
+      },
+      {
+        q: "9. Donnez une commande lsof pour lister tous les fichiers ouverts par un processus, ce qui pourrait aider à identifier des activités suspectes.",
+        a: "`sudo lsof -p <PID>` (par identifiant de processus) ou `sudo lsof -c <nom_processus>`.",
+        cmd: "lsof -p 1240"
+      },
+      {
+        q: "10. Comment utiliser lsof pour identifier quel processus écoute sur le port 8080 ?",
+        a: "`sudo lsof -i :8080`",
+        cmd: "lsof -i :8080"
+      },
+      {
+        q: "11. Donnez un exemple d'utilisation de chattr pour rendre un fichier impossible à supprimer.",
+        a: "`sudo chattr +i fichier_important.conf` (active l'attribut immuable `i`).",
+        cmd: "chattr +i fichier_important.conf"
+      }
+    ];
+
+    const ds2026Ex = [
+      { cmd: "ifconfig wlp0s2 192.168.100.10", exp: "Configure manuellement l'interface réseau sans fil (Wi-Fi) `wlp0s2` en lui attribuant l'adresse IPv4 `192.168.100.10` et active l'interface." },
+      { cmd: "find / -perm 3210", exp: "Recherche depuis la racine `/` tous les fichiers/dossiers ayant exactement les permissions octales `3210` (`-w--wx--T`) : `3` = SGID (2) + Sticky Bit (1), `2` = écriture seule pour le propriétaire (`-w-`), `1` = exécution seule pour le groupe (`--x` → `--s`), `0` = aucun droit pour les autres (`---` → `--T`)." },
+      { cmd: "nmap -sS 192.168.10.0", exp: "Lance un scan de ports furtif TCP SYN (half-open scan) sur l'adresse `192.168.10.0` (pour scanner tout le sous-réseau, il faudrait écrire `192.168.10.0/24`)." },
+      { cmd: "netstat -s 192.168.10.100", exp: "L'option `-s` affiche les statistiques réseau globales par protocole (TCP, UDP, ICMP, IP). Attention (piège) : `netstat -s` ne prend pas d'adresse IP en filtre, donc `192.168.10.100` est ignoré/invalide." },
+      { cmd: "ps -aux | grep docker", exp: "Affiche tous les processus en cours sur la machine (`ps -aux`) et filtre la sortie pour n'afficher que les processus contenant la chaîne `docker`." },
+      { cmd: "tcpdump tcp src 53", exp: "Capture les paquets TCP provenant (`src`) de l'hôte 53 (ou, si le mot-clé `port` a été omis dans l'énoncé `tcp src port 53`, cherche à capturer le trafic TCP dont le port source est le port 53 DNS)." },
+      { cmd: "chmod 4532 file", exp: "Applique le masque octal `4532` (`-r-s-wx-w-`) au fichier `file` : `4` active le bit SUID, `5` (4+1) donne lecture + exécution au propriétaire (`r-s`), `3` (2+1) donne écriture + exécution au groupe (`-wx`), et `2` donne écriture seule aux autres (`-w-`)." },
+      { cmd: "chattr -i file", exp: "Retire (`-i`) l'attribut étendu d'immuabilité sur le fichier `file`, permettant à nouveau de le modifier, le renommer ou le supprimer." }
+    ];
+
+    const ds2024Questions = [
+      {
+        q: "1. Décrire les méthodes suivantes : Authentification, Confidentialité et Intégrité.",
+        a: "Identique au DS 2025-2026 : Authentification = vérification d'identité ; Confidentialité = protection contre la divulgation non autorisée ; Intégrité = protection contre toute altération/modification.",
+        cmd: "sha256sum /etc/passwd"
+      },
+      {
+        q: "2. Expliquer les mécanismes : Cryptographie et hachage. Donner un exemple pratique et citer un algorithme pour chaque technique.",
+        a: "• Cryptographie (Chiffrement) : transformation réversible de données claires en données chiffrées à l'aide d'une clé pour assurer la confidentialité. Exemple : HTTPS (TLS) ou chiffrement de disque LUKS. Algorithmes : AES, RSA.\n• Hachage : transformation irréversible (à sens unique, sans clé) produisant une empreinte de taille fixe pour assurer l'intégrité ou stocker des mots de passe. Exemple : mots de passe dans `/etc/shadow` ou GRUB. Algorithmes : SHA-256, SHA-512, MD5, PBKDF2.",
+        cmd: "grub-mkpasswd-pbkdf2"
+      },
+      {
+        q: "3. Comment peut-on sécuriser le chargeur de démarrage ?",
+        a: "Sous GRUB : 1) Générer un hash avec `grub-mkpasswd-pbkdf2`, 2) Définir `set superusers=\"admin\"` et `password_pbkdf2 admin <hash>` dans `/etc/grub.d/40_custom`, 3) Exécuter `sudo update-grub`, et protéger `/boot/grub/grub.cfg` (`chmod 600`) + activer Secure Boot et mot de passe BIOS/UEFI.",
+        cmd: "sudo update-grub"
+      },
+      {
+        q: "4. Pourquoi est-il déconseillé d'utiliser le multi-boot dans le cas des serveurs et des Data Centers ?",
+        a: "1) Risque d'accès direct aux données : depuis un OS, on peut monter les partitions non chiffrées de l'autre OS et contourner toutes ses politiques de sécurité.\n2) Risque d'écrasement du bootloader (GRUB).\n3) Perte de disponibilité : en multiboot, un seul OS tourne à la fois (arrêter un serveur de production pour démarrer un autre OS est inacceptable en Data Center ; on utilise la virtualisation).",
+        cmd: "cat /etc/fstab"
+      },
+      {
+        q: "5. Donner la syntaxe de la commande qui permet de crypter (hacher) le mot de passe du GRUB.",
+        a: "`grub-mkpasswd-pbkdf2`",
+        cmd: "grub-mkpasswd-pbkdf2"
+      },
+      {
+        q: "6. Comment peut-on afficher les propriétés des cartes réseaux (Système Linux) ?",
+        a: "`ip addr show` (ou `ifconfig -a`, et `ethtool eth0` pour les propriétés physiques).",
+        cmd: "ip addr show"
+      },
+      {
+        q: "7. Quelle est la commande qui permet d'afficher les statistiques réseau par interface ?",
+        a: "`netstat -i` (ou `ip -s link`).",
+        cmd: "netstat -i"
+      },
+      {
+        q: "8. À l'aide de netstat déterminer les services disponibles sur la machine 192.168.1.10.",
+        a: "Sur la machine concernée : `netstat -tulnp | grep 192.168.1.10` (affiche tous les services TCP/UDP en écoute attachés à l'adresse 192.168.1.10).",
+        cmd: "netstat -tulnp"
+      },
+      {
+        q: "9. Comment peut-on afficher la version du système cible ?",
+        a: "En local : `uname -a` ou `cat /etc/os-release`. À distance : `nmap -O 192.168.1.10`.",
+        cmd: "nmap -O 192.168.1.10"
+      },
+      {
+        q: "10. À l'aide de tcpdump capturer le trafic du port (https) de l'interface eth0 et l'enregistrer dans /tmp/tcpdump.",
+        a: "`sudo tcpdump -i eth0 port 443 -w /tmp/tcpdump` (ou `port https`).",
+        cmd: "tcpdump -i eth0 port 443 -w /tmp/tcpdump"
+      },
+      {
+        q: "11. Expliquer le rôle du fichier .rhosts",
+        a: "Situé dans le dossier personnel (`~/.rhosts`), il liste les machines distantes et utilisateurs autorisés à se connecter sans mot de passe via les commandes historiques `rlogin`, `rsh` et `rcp`. C'est une vulnérabilité critique (pas de chiffrement, usurpation d'IP facile).",
+        cmd: "cat ~/.rhosts"
+      }
+    ];
+
+    const ds2024Ex = [
+      { cmd: "ps -aux | grep proftpd", exp: "Liste tous les processus actifs du système et filtre avec `grep` pour vérifier si le démon du serveur FTP `proftpd` est en cours d'exécution." },
+      { cmd: "netcat 192.168.1.10 23", exp: "Ouvre une connexion TCP brute avec `netcat` vers la machine `192.168.1.10` sur le port `23` (service Telnet) pour interagir avec le service ou lire sa bannière." },
+      { cmd: "nmap -sS 192.168.1.10", exp: "Exécute un scan de ports furtif TCP SYN (stealth scan) sur l'hôte `192.168.1.10` pour découvrir ses ports TCP ouverts." },
+      { cmd: "nmap -sP 192.168.1.*", exp: "Exécute un Ping Scan (`-sP`, découverte d'hôtes sans scanner les ports) sur les 256 adresses du sous-réseau `192.168.1.0/24` pour lister les machines actives." },
+      { cmd: "tcpdump -i eth0 'tcp and (src 10.90.1.105 dst 192.168.1.10)' | tee /tmp/tcpdump", exp: "Capture sur `eth0` les paquets TCP allant de l'IP source `10.90.1.105` vers l'IP destination `192.168.1.10`, les affiche à l'écran et les copie simultanément en texte dans `/tmp/tcpdump` grâce à `tee` (note : il manque l'opérateur `and` entre `src` et `dst`)." },
+      { cmd: "telnet ftp.oranix.com 21", exp: "Connecte le client `telnet` au serveur `ftp.oranix.com` sur le port TCP `21` (port de contrôle FTP) pour tester l'ouverture du service et récupérer sa bannière." },
+      { cmd: "netstat -tuna | grep https", exp: "Affiche toutes les connexions TCP/UDP au format numérique (`-n`) et filtre `https`. Piège : à cause de `-n`, le port s'affiche `443` et non `https`, donc `grep https` ne renverra aucune ligne ! Il faut retirer `-n` ou chercher `:443`." },
+      { cmd: "tcpdump -i eth0 file -r", exp: "Commande erronée : `-r <fichier>` sert à relire un fichier de capture existant et ne peut pas être combiné avec une capture live `-i eth0`, de plus le nom `file` doit être placé après `-r` (`tcpdump -r file`)." },
+      { cmd: "find / -perm +6000", exp: "Recherche dans toute l'arborescence `/` les fichiers ayant au moins l'un des bits spéciaux SUID (`4000`) OU SGID (`2000`) activé (`4000 + 2000 = 6000`)." },
+      { cmd: "rlogin -l test linux", exp: "Ouvre une session interactive distante non chiffrée (`rlogin`) sur la machine `linux` en utilisant le nom d'utilisateur `test` (`-l test`)." },
+      { cmd: "rsh linux ps", exp: "Exécute à distance la commande `ps` (liste des processus) sur la machine `linux` via Remote Shell (`rsh`) et affiche le résultat sur le terminal local." }
+    ];
+
+    // =========================================================================
+    // ÉTAT DE L'INTERFACE & RENDU DYNAMIQUE
+    // =========================================================================
+    let currentMode = "slides";
+    let currentSlideIndex = 0;
+
+    function buildSidebarNav() {
+      const navList = document.getElementById("slide-nav-list");
+      navList.innerHTML = slidesData.map((s, idx) => `
+        <button class="nav-btn ${currentMode === 'slides' && idx === currentSlideIndex ? 'active' : ''}" onclick="goToSlide(${idx})" id="slide-btn-${idx}">
+          <span class="slide-num-pill">S${s.num}</span>
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${s.title}</span>
+        </button>
+      `).join("");
+    }
+
+    function updateActiveModeButtons() {
+      document.querySelectorAll(".nav-tabs .nav-btn").forEach(b => b.classList.remove("active"));
+      if (currentMode === "slides") {
+        document.getElementById("mode-slides-btn").classList.add("active");
+        const activeSlideBtn = document.getElementById(`slide-btn-${currentSlideIndex}`);
+        if (activeSlideBtn) activeSlideBtn.classList.add("active");
+      } else if (currentMode === "all-slides") {
+        document.getElementById("mode-all-btn").classList.add("active");
+      } else if (currentMode === "chmod-calc") {
+        document.getElementById("mode-calc-btn").classList.add("active");
+      } else if (currentMode === "ds-2026") {
+        document.getElementById("mode-ds26-btn").classList.add("active");
+      } else if (currentMode === "ds-2024") {
+        document.getElementById("mode-ds24-btn").classList.add("active");
+      }
+    }
+
+    function renderSlideCard(s) {
+      return `
+        <div class="card" id="slide-card-${s.num}">
+          <div class="slide-header">
+            <span class="slide-badge">SLIDE ${s.num} / 23</span>
+            <h2 class="slide-title" style="flex:1; margin-left:0.75rem;">${s.title}</h2>
+          </div>
+
+          <div class="section-box box-slide-official">
+            <div class="box-label label-blue">📌 Contenu officiel de la Slide ${s.num}</div>
+            <ul class="clean-list">
+              ${s.official.map(item => `<li>${formatInlineCode(item)}</li>`).join("")}
+            </ul>
+          </div>
+
+          <div class="section-box box-prof-explain">
+            <div class="box-label label-green">🎓 Explication approfondie du Professeur</div>
+            <p style="font-size:0.93rem; color:#e2e8f0; white-space:pre-line;">${formatInlineCode(s.profExplain)}</p>
+          </div>
+
+          <div class="section-box box-trap">
+            <div class="box-label label-red">⚠️ Piège d'examen à éviter absolument</div>
+            <p style="font-size:0.91rem; color:#fecdd3;">${formatInlineCode(s.trap)}</p>
+          </div>
+
+          <div class="section-box box-exercise">
+            <div class="box-label label-purple">💻 Exercice d'application & Terminal (Slide ${s.num})</div>
+            <p style="font-size:0.92rem; font-weight:600; color:#f3e8ff; margin-bottom:0.65rem;">${formatInlineCode(s.exerciseQ)}</p>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="runCommand(${JSON.stringify(s.exerciseCmd).replace(/"/g, '&quot;')})">
+                ▶ Exécuter dans le terminal : ${s.exerciseCmd}
+              </button>
+              <button class="btn btn-emerald" onclick="toggleSolution('sol-slide-${s.num}')">
+                👁️ Afficher / Masquer le corrigé expliqué
+              </button>
+            </div>
+            <div class="solution-box" id="sol-slide-${s.num}">
+              <div style="font-size:0.82rem; color:#34d399; font-weight:700; margin-bottom:0.3rem;">CORRIGÉ DÉTAILLÉ :</div>
+              <pre class="code-block">$ ${s.exerciseCmd}</pre>
+              <p style="font-size:0.89rem; color:#e2e8f0;">${formatInlineCode(s.exerciseAns)}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function formatInlineCode(text) {
+      return text.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+    }
+
+    function toggleSolution(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("open");
+    }
+
+    function renderView() {
+      const panel = document.getElementById("left-panel");
+      updateActiveModeButtons();
+
+      if (currentMode === "slides") {
+        const s = slidesData[currentSlideIndex];
+        panel.innerHTML = renderSlideCard(s) + `
+          <div style="display:flex; justify-content:space-between; margin-top:1rem;">
+            <button class="btn" onclick="prevSlide()" ${currentSlideIndex === 0 ? 'disabled style="opacity:0.4"' : ''}>◀ Slide ${currentSlideIndex}</button>
+            <span style="color:var(--text-muted); font-size:0.88rem; align-self:center;">Slide ${s.num} sur 23</span>
+            <button class="btn btn-primary" onclick="nextSlide()" ${currentSlideIndex === slidesData.length - 1 ? 'disabled style="opacity:0.4"' : ''}>Slide ${s.num + 1} ▶</button>
+          </div>
+        `;
+      } else if (currentMode === "all-slides") {
+        panel.innerHTML = `
+          <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e1b4b);">
+            <h2 class="slide-title">Intégralité des 23 Slides commentées + Exercices corrigés</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.3rem;">Clique sur n'importe quel bouton « Exécuter dans le terminal » pour tester les commandes en direct à droite.</p>
+          </div>
+          ${slidesData.map(s => renderSlideCard(s)).join("")}
+        `;
+      } else if (currentMode === "chmod-calc") {
+        panel.innerHTML = renderChmodCalculator();
+        updateChmodFromCheckboxes();
+      } else if (currentMode === "ds-2026") {
+        panel.innerHTML = renderExamView(
+          "Corrigé Complet — Devoir Surveillé 1 (2025-2026 • Parcours L-EB2)",
+          "Matière : Fondement de la sécurité • Durée : 1h • Questions de cours (12 pts) + Exercice d'interprétation (8 pts)",
+          ds2026Questions,
+          ds2026Ex,
+          "ds26"
+        );
+      } else if (currentMode === "ds-2024") {
+        panel.innerHTML = renderExamView(
+          "Corrigé Complet — Devoir Surveillé 1 (2023-2024 • Parcours L-BI3)",
+          "Matière : Sécurité des SI • Durée : 1h • Questions de cours (10 pts) + Exercice d'interprétation (10 pts)",
+          ds2024Questions,
+          ds2024Ex,
+          "ds24"
+        );
+      }
+    }
+
+    function renderExamView(title, subtitle, questions, exList, prefix) {
+      return `
+        <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e293b);">
+          <span class="slide-badge">EXAMEN OFFICIEL CORRIGÉ</span>
+          <h2 class="slide-title" style="margin-top:0.5rem;">${title}</h2>
+          <p style="color:var(--text-muted); font-size:0.88rem; margin-top:0.25rem;">${subtitle}</p>
+        </div>
+
+        <div class="card">
+          <h3 style="color:var(--accent); margin-bottom:1rem; font-size:1.1rem;">Partie 1 : Questions de cours (${questions.length} questions)</h3>
+          ${questions.map((item, idx) => `
+            <div class="section-box box-slide-official" style="margin-bottom:0.9rem;">
+              <div style="font-weight:700; color:#fff; margin-bottom:0.5rem;">${formatInlineCode(item.q)}</div>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button class="btn btn-emerald" onclick="toggleSolution('${prefix}-q-${idx}')">👁️ Voir la réponse du Prof</button>
+                <button class="btn btn-primary" onclick="runCommand(${JSON.stringify(item.cmd).replace(/"/g, '&quot;')})">▶ Tester : ${item.cmd}</button>
+              </div>
+              <div class="solution-box open" id="${prefix}-q-${idx}">
+                <p style="white-space:pre-line; font-size:0.89rem; color:#e2e8f0;">${formatInlineCode(item.a)}</p>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="card">
+          <h3 style="color:#c084fc; margin-bottom:1rem; font-size:1.1rem;">Partie 2 : Exercice — Interprétez le résultat des commandes suivantes</h3>
+          <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1rem;">Clique sur chaque commande pour l'exécuter dans le simulateur de terminal à droite et voir son analyse détaillée :</p>
+          ${exList.map((ex, i) => `
+            <div class="section-box box-exercise" style="margin-bottom:0.85rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                <span style="font-family:var(--font-mono); font-size:0.95rem; font-weight:700; color:#38bdf8;">${i + 1}. ${ex.cmd}</span>
+                <button class="btn btn-primary" onclick="runCommand(${JSON.stringify(ex.cmd).replace(/"/g, '&quot;')})">▶ Simuler dans le terminal</button>
+              </div>
+              <p style="font-size:0.9rem; color:#e2e8f0; margin-top:0.55rem;"><b>Interprétation :</b> ${formatInlineCode(ex.exp)}</p>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderChmodCalculator() {
+      return `
+        <div class="card">
+          <div class="slide-header">
+            <span class="slide-badge">OUTIL INTERACTIF</span>
+            <h2 class="slide-title" style="flex:1; margin-left:0.75rem;">Calculateur de Permissions Unix (SUID, SGID, Sticky Bit, chmod & find)</h2>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">
+            Coche les cases ou saisis directement un code octal d'examen (comme <code class="inline-code">4532</code>, <code class="inline-code">3210</code>, <code class="inline-code">1777</code>, <code class="inline-code">4755</code>) pour comprendre instantanément comment Linux construit la chaîne <code class="inline-code">ls -l</code> !
+          </p>
+
+          <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; margin-bottom:1rem;">
+            <label style="font-weight:700; font-size:0.9rem;">Code Octal (3 ou 4 chiffres) :</label>
+            <input type="text" id="octal-input" value="4532" maxlength="4" oninput="updateChmodFromInput(this.value)" style="background:#090d16; border:1px solid var(--accent); color:#38bdf8; font-family:var(--font-mono); font-size:1.15rem; font-weight:800; width:110px; padding:0.4rem 0.65rem; border-radius:0.45rem; text-align:center;" />
+            <button class="btn" onclick="setPresetOctal('4532')">Ex DS: 4532</button>
+            <button class="btn" onclick="setPresetOctal('3210')">Ex DS: 3210</button>
+            <button class="btn" onclick="setPresetOctal('4755')">passwd (4755)</button>
+            <button class="btn" onclick="setPresetOctal('1777')">/tmp (1777)</button>
+            <button class="btn" onclick="setPresetOctal('0644')">Standard (0644)</button>
+          </div>
+
+          <div class="calc-grid">
+            <div class="calc-col">
+              <h4>1. Bits Spéciaux</h4>
+              <label><input type="checkbox" id="chk-suid" onchange="updateChmodFromCheckboxes()" checked /> SUID (4) — Set User ID</label>
+              <label><input type="checkbox" id="chk-sgid" onchange="updateChmodFromCheckboxes()" /> SGID (2) — Set Group ID</label>
+              <label><input type="checkbox" id="chk-sticky" onchange="updateChmodFromCheckboxes()" /> Sticky Bit (1)</label>
+            </div>
+            <div class="calc-col">
+              <h4>2. User (Propriétaire)</h4>
+              <label><input type="checkbox" id="chk-ur" onchange="updateChmodFromCheckboxes()" checked /> r (Read = 4)</label>
+              <label><input type="checkbox" id="chk-uw" onchange="updateChmodFromCheckboxes()" /> w (Write = 2)</label>
+              <label><input type="checkbox" id="chk-ux" onchange="updateChmodFromCheckboxes()" checked /> x (Execute = 1)</label>
+            </div>
+            <div class="calc-col">
+              <h4>3. Group (Groupe)</h4>
+              <label><input type="checkbox" id="chk-gr" onchange="updateChmodFromCheckboxes()" /> r (Read = 4)</label>
+              <label><input type="checkbox" id="chk-gw" onchange="updateChmodFromCheckboxes()" checked /> w (Write = 2)</label>
+              <label><input type="checkbox" id="chk-gx" onchange="updateChmodFromCheckboxes()" checked /> x (Execute = 1)</label>
+            </div>
+            <div class="calc-col">
+              <h4>4. Others (Autres)</h4>
+              <label><input type="checkbox" id="chk-or" onchange="updateChmodFromCheckboxes()" /> r (Read = 4)</label>
+              <label><input type="checkbox" id="chk-ow" onchange="updateChmodFromCheckboxes()" checked /> w (Write = 2)</label>
+              <label><input type="checkbox" id="chk-ox" onchange="updateChmodFromCheckboxes()" /> x (Execute = 1)</label>
+            </div>
+          </div>
+
+          <div class="section-box box-prof-explain" id="chmod-result-box"></div>
+        </div>
+      `;
+    }
+
+    function setPresetOctal(val) {
+      const inp = document.getElementById("octal-input");
+      if (inp) {
+        inp.value = val;
+        updateChmodFromInput(val);
+      }
+    }
+
+    function updateChmodFromInput(val) {
+      const clean = val.replace(/[^0-7]/g, "");
+      if (clean.length < 3) return;
+      const padded = clean.length === 3 ? "0" + clean : clean.slice(0, 4);
+      const s = parseInt(padded[0], 10);
+      const u = parseInt(padded[1], 10);
+      const g = parseInt(padded[2], 10);
+      const o = parseInt(padded[3], 10);
+
+      document.getElementById("chk-suid").checked = !!(s & 4);
+      document.getElementById("chk-sgid").checked = !!(s & 2);
+      document.getElementById("chk-sticky").checked = !!(s & 1);
+
+      document.getElementById("chk-ur").checked = !!(u & 4);
+      document.getElementById("chk-uw").checked = !!(u & 2);
+      document.getElementById("chk-ux").checked = !!(u & 1);
+
+      document.getElementById("chk-gr").checked = !!(g & 4);
+      document.getElementById("chk-gw").checked = !!(g & 2);
+      document.getElementById("chk-gx").checked = !!(g & 1);
+
+      document.getElementById("chk-or").checked = !!(o & 4);
+      document.getElementById("chk-ow").checked = !!(o & 2);
+      document.getElementById("chk-ox").checked = !!(o & 1);
+
+      renderChmodSummary(s, u, g, o);
+    }
+
+    function updateChmodFromCheckboxes() {
+      const s = (document.getElementById("chk-suid").checked ? 4 : 0) +
+                (document.getElementById("chk-sgid").checked ? 2 : 0) +
+                (document.getElementById("chk-sticky").checked ? 1 : 0);
+      const u = (document.getElementById("chk-ur").checked ? 4 : 0) +
+                (document.getElementById("chk-uw").checked ? 2 : 0) +
+                (document.getElementById("chk-ux").checked ? 1 : 0);
+      const g = (document.getElementById("chk-gr").checked ? 4 : 0) +
+                (document.getElementById("chk-gw").checked ? 2 : 0) +
+                (document.getElementById("chk-gx").checked ? 1 : 0);
+      const o = (document.getElementById("chk-or").checked ? 4 : 0) +
+                (document.getElementById("chk-ow").checked ? 2 : 0) +
+                (document.getElementById("chk-ox").checked ? 1 : 0);
+
+      document.getElementById("octal-input").value = `${s}${u}${g}${o}`;
+      renderChmodSummary(s, u, g, o);
+    }
+
+    function renderChmodSummary(s, u, g, o) {
+      const ur = (u & 4) ? "r" : "-";
+      const uw = (u & 2) ? "w" : "-";
+      let ux = (u & 1) ? "x" : "-";
+      if (s & 4) ux = (u & 1) ? "s" : "S";
+
+      const gr = (g & 4) ? "r" : "-";
+      const gw = (g & 2) ? "w" : "-";
+      let gx = (g & 1) ? "x" : "-";
+      if (s & 2) gx = (g & 1) ? "s" : "S";
+
+      const or_ = (o & 4) ? "r" : "-";
+      const ow = (o & 2) ? "w" : "-";
+      let ox = (o & 1) ? "x" : "-";
+      if (s & 1) ox = (o & 1) ? "t" : "T";
+
+      const sym = `-${ur}${uw}${ux}${gr}${gw}${gx}${or_}${ow}${ox}`;
+      const code = `${s}${u}${g}${o}`;
+
+      const box = document.getElementById("chmod-result-box");
+      if (!box) return;
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <div style="font-size:0.78rem; color:#34d399; font-weight:700;">AFFICHAGE LS -L :</div>
+            <div style="font-family:var(--font-mono); font-size:1.35rem; font-weight:800; color:#fff;">${sym} 1 root root 4096 Oct 14 14:30 file</div>
+          </div>
+          <button class="btn btn-primary" onclick="runCommand('chmod ${code} file')">▶ Tester chmod ${code} file dans le terminal</button>
+        </div>
+        <ul class="clean-list" style="margin-top:0.75rem;">
+          <li><b>Bits spéciaux (${s}) :</b> ${s === 0 ? 'Aucun' : [ (s&4)?'SUID (4)':'' , (s&2)?'SGID (2)':'' , (s&1)?'Sticky Bit (1)':'' ].filter(Boolean).join(' + ')}</li>
+          <li><b>Propriétaire / User (${u}) :</b> <code class="inline-code">${ur}${uw}${ux}</code> (${(u&4)?'Lecture ':''}${(u&2)?'Écriture ':''}${(u&1)?'Exécution ':''}${u===0?'Aucun droit':''})</li>
+          <li><b>Groupe / Group (${g}) :</b> <code class="inline-code">${gr}${gw}${gx}</code> (${(g&4)?'Lecture ':''}${(g&2)?'Écriture ':''}${(g&1)?'Exécution ':''}${g===0?'Aucun droit':''})</li>
+          <li><b>Autres / Others (${o}) :</b> <code class="inline-code">${or_}${ow}${ox}</code> (${(o&4)?'Lecture ':''}${(o&2)?'Écriture ':''}${(o&1)?'Exécution ':''}${o===0?'Aucun droit':''})</li>
+        </ul>
+      `;
+    }
+
+    function switchMode(mode) {
+      currentMode = mode;
+      renderView();
+      buildSidebarNav();
+    }
+
+    function goToSlide(idx) {
+      currentMode = "slides";
+      currentSlideIndex = idx;
+      renderView();
+      buildSidebarNav();
+    }
+
+    function prevSlide() {
+      if (currentMode !== "slides") {
+        currentMode = "slides";
+      } else if (currentSlideIndex > 0) {
+        currentSlideIndex--;
+      }
+      renderView();
+      buildSidebarNav();
+    }
+
+    function nextSlide() {
+      if (currentMode !== "slides") {
+        currentMode = "slides";
+      } else if (currentSlideIndex < slidesData.length - 1) {
+        currentSlideIndex++;
+      }
+      renderView();
+      buildSidebarNav();
+    }
+
+    function filterSlides(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        renderView();
+        return;
+      }
+      const matches = slidesData.filter(s =>
+        s.title.toLowerCase().includes(q) ||
+        s.official.some(o => o.toLowerCase().includes(q)) ||
+        s.profExplain.toLowerCase().includes(q) ||
+        s.exerciseCmd.toLowerCase().includes(q)
+      );
+      const panel = document.getElementById("left-panel");
+      if (matches.length === 0) {
+        panel.innerHTML = `<div class="card"><p>Aucune slide ne correspond à « <b>${query}</b> ».</p></div>`;
+      } else {
+        panel.innerHTML = matches.map(s => renderSlideCard(s)).join("");
+      }
+    }
+
+    // =========================================================================
+    // MOTEUR DU SIMULATEUR DE TERMINAL LINUX INTERACTIF
+    // =========================================================================
+    function clearTerminal() {
+      document.getElementById("term-output").innerHTML = `<div class="term-line"><span class="term-prompt-str">Terminal effacé. Prêt pour une nouvelle commande.</span></div>`;
+    }
+
+    function handleTerminalSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById("term-input");
+      const cmd = input.value.trim();
+      if (!cmd) return;
+      input.value = "";
+      runCommand(cmd);
+    }
+
+    function runCommand(rawCmd) {
+      const cmd = rawCmd.trim();
+      const termOut = document.getElementById("term-output");
+      if (cmd === "clear") {
+        clearTerminal();
+        return;
+      }
+
+      const res = simulateLinuxCommand(cmd);
+      const block = document.createElement("div");
+      block.className = "term-line";
+      block.innerHTML = `
+        <div><span class="term-prompt-str">root@fsegn-sec:~#</span> <span class="term-cmd-str">${escapeHtml(cmd)}</span></div>
+        <div class="term-output-str">${escapeHtml(res.output)}</div>
+        ${res.explanation ? `<div class="term-explain-str">💡 <b>Explication Prof :</b> ${res.explanation}</div>` : ""}
+      `;
+      termOut.appendChild(block);
+      termOut.scrollTop = termOut.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function simulateLinuxCommand(cmd) {
+      const c = cmd.toLowerCase();
+
+      if (c === "help") {
+        return {
+          output: "Commandes supportées dans ce laboratoire :\n- Boot & Firmware : grub-mkpasswd-pbkdf2, sudo update-grub, sudo lilo, [ -d /sys/firmware/efi ] ...\n- Permissions : chmod <octal> <file>, chown, ls -l /usr/bin/passwd, ls -ld /tmp\n- Recherche & Attributs : find / -perm ..., chattr +i / -i / +a, lsattr, sha256sum\n- Réseau : ifconfig, ip addr show, netstat (-tunap, -i, -s), nmap (-sS, -sP, -O), tcpdump, netcat, telnet\n- Processus & Logs : ps -aux | grep ..., lsof (-i :8080, -p), tail -f /var/log/auth.log, grep, journalctl\n- Utilisateurs & PAM : useradd, usermod, userdel, getent passwd, lastlog, visudo, rlogin, rsh",
+          explanation: "Clique sur n'importe quel exercice à gauche ou tape directement une commande des Devoirs Surveillés !"
+        };
+      }
+
+      if (cmd.includes("/sys/firmware/efi")) {
+        return {
+          output: "UEFI",
+          explanation: "Le dossier `/sys/firmware/efi` existe sur ce serveur : le système a démarré en mode **UEFI** (avec support du Secure Boot) et non en mode BIOS Legacy."
+        };
+      }
+
+      if (c.includes("grub-mkpasswd-pbkdf2")) {
+        return {
+          output: "Entrez le mot de passe : ********\nRéentrez le mot de passe : ********\nLe hachage PBKDF2 de votre mot de passe est :\ngrub.pbkdf2.sha512.10000.9F8A7B6C5D4E3F2A1B0C9D8E7F6A5B4C3D2E1F0A9B8C7D6E5F4A3B2C1D0E",
+          explanation: "Génère une empreinte hachée en SHA-512 (10 000 itérations PBKDF2) à placer dans `/etc/grub.d/40_custom` suivie de `sudo update-grub` (Question 5 du DS 2023-2024 et Question 2 du DS 2025-2026)."
+        };
+      }
+
+      if (c.includes("update-grub")) {
+        return {
+          output: "Sourcing file `/etc/default/grub'\nGenerating grub configuration file ...\nFound linux image: /boot/vmlinuz-6.8.0-generic\nAdding boot menu entry for UEFI Firmware Settings ...\ndone",
+          explanation: "Compile les scripts de `/etc/grub.d/` (dont `40_custom` contenant le mot de passe superuser) pour générer `/boot/grub/grub.cfg`."
+        };
+      }
+
+      if (c === "sudo lilo" || c === "lilo") {
+        return {
+          output: "Added Linux * (restricted, password protected)",
+          explanation: "Applique les modifications de `/etc/lilo.conf` dans le secteur de démarrage (nécessaire après chaque modification dans LILO)."
+        };
+      }
+
+      if (c.includes("cat /etc/fstab")) {
+        return {
+          output: "# Partitionnement sécurisé\n/dev/sda1  /boot  ext4  defaults  0 2\n/dev/sda2  /      ext4  defaults  0 1\n/dev/sda3  /home  ext4  defaults  0 2\n/dev/sda4  swap   swap  defaults  0 0",
+          explanation: "Isoler `/boot`, `/` et `/home` sur des partitions séparées empêche la saturation du disque racine et permet de chiffrer `/home` contre les risques du multiboot."
+        };
+      }
+
+      // Dynamic chmod parser
+      const chmodMatch = cmd.match(/^chmod\s+([0-7]{3,4})\s+(.+)$/i);
+      if (chmodMatch) {
+        const oct = chmodMatch[1].length === 3 ? "0" + chmodMatch[1] : chmodMatch[1];
+        const target = chmodMatch[2];
+        const s = parseInt(oct[0], 10), u = parseInt(oct[1], 10), g = parseInt(oct[2], 10), o = parseInt(oct[3], 10);
+        const sym = `-${(u&4)?'r':'-'}${(u&2)?'w':'-'}${(s&4)?((u&1)?'s':'S'):((u&1)?'x':'-')}${(g&4)?'r':'-'}${(g&2)?'w':'-'}${(s&2)?((g&1)?'s':'S'):((g&1)?'x':'-')}${(o&4)?'r':'-'}${(o&2)?'w':'-'}${(s&1)?((o&1)?'t':'T'):((o&1)?'x':'-')}`;
+        return {
+          output: `mode of '${target}' changed to ${oct} (${sym.slice(1)})`,
+          explanation: `Code octal **${oct}** appliqué sur \`${target}\` → affichage \`ls -l\` : \`${sym}\`. Spécial=${s} (${(s&4)?'SUID ':''}${(s&2)?'SGID ':''}${(s&1)?'Sticky ':''}${s===0?'aucun':''}), User=${u}, Group=${g}, Others=${o}.`
+        };
+      }
+
+      if (c.includes("chown")) {
+        return {
+          output: `changed ownership of '${cmd.split(" ").pop()}'`,
+          explanation: "La commande `chown` modifie le propriétaire (et le groupe si suivi de `:groupe`) du fichier."
+        };
+      }
+
+      if (c.includes("ls -l /usr/bin/passwd")) {
+        return {
+          output: "-rwsr-xr-x 1 root root 63960 Feb  7 2020 /usr/bin/passwd",
+          explanation: "Remarque le `s` dans `-rwsr-xr-x` : le bit **SUID (4000)** est activé. Quand un utilisateur normal lance `passwd`, le programme tourne avec les droits de `root` pour pouvoir modifier `/etc/shadow`."
+        };
+      }
+
+      if (c.includes("ls -ld /tmp")) {
+        return {
+          output: "drwxrwxrwt 10 root root 4096 Nov 15 10:30 /tmp",
+          explanation: "Remarque le `t` à la fin de `drwxrwxrwt` (1777) : c'est le **Sticky Bit**. Tout le monde peut créer des fichiers dans `/tmp`, mais seul le propriétaire d'un fichier peut le supprimer."
+        };
+      }
+
+      if (c.includes("find") && c.includes("3210")) {
+        return {
+          output: "/var/spool/secret_drop\n/opt/shared/lockbox",
+          explanation: "**Exercice 1 (Q2 du DS 2025-2026)** : `find / -perm 3210` cherche les fichiers ayant exactement le masque `3210` (`-w--wx--T`) : `3` = SGID (2) + Sticky Bit (1), User = `2` (`-w-`), Group = `1` (`--x` → `--s`), Others = `0` (`---` → `--T`)."
+        };
+      }
+
+      if (c.includes("find") && c.includes("6000")) {
+        return {
+          output: "/usr/bin/passwd\n/usr/bin/sudo\n/usr/bin/crontab\n/usr/bin/wall",
+          explanation: "**Exercice (Q9 du DS 2023-2024)** : `find / -perm +6000` (ou `/6000`) recherche tous les fichiers ayant le bit **SUID (4000) OU SGID (2000)** activé (4000 + 2000 = 6000)."
+        };
+      }
+
+      if (c.includes("find") && c.includes("4000")) {
+        return {
+          output: "/usr/bin/passwd\n/usr/bin/sudo\n/usr/bin/su\n/usr/bin/mount\n/usr/bin/chsh",
+          explanation: "**Question 5 du DS 2025-2026** : Recherche dans toute l'arborescence `/` les fichiers possédant le bit **SUID (4000)** activé. `2>/dev/null` masque les erreurs de permission."
+        };
+      }
+
+      if (c.includes("chattr -i")) {
+        return {
+          output: "Attribut immuable (-i) retiré avec succès.",
+          explanation: "**Exercice 1 (Q8 du DS 2025-2026)** : `chattr -i file` désactive l'attribut d'immuabilité. Le fichier peut à nouveau être modifié ou supprimé."
+        };
+      }
+
+      if (c.includes("chattr +i")) {
+        return {
+          output: "Attribut immuable (+i) activé : ----i---------e-------",
+          explanation: "**Questions 4b & 11 du DS 2025-2026** : `chattr +i` rend le fichier **immuable**. Même `root` ne peut plus le supprimer, le renommer ou le modifier tant que `chattr -i` n'est pas exécuté."
+        };
+      }
+
+      if (c.includes("sha256sum")) {
+        return {
+          output: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /etc/passwd",
+          explanation: "**Question 4a du DS 2025-2026** : Calcule l'empreinte cryptographique SHA-256 du fichier pour vérifier son **intégrité** (s'assurer qu'il n'a pas été altéré)."
+        };
+      }
+
+      if (c.includes("ifconfig wlp0s2")) {
+        return {
+          output: "wlp0s2: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet 192.168.100.10  netmask 255.255.255.0  broadcast 192.168.100.255",
+          explanation: "**Exercice 1 (Q1 du DS 2025-2026)** : Assigne l'adresse IP `192.168.100.10` à la carte réseau Wi-Fi `wlp0s2`."
+        };
+      }
+
+      if (c.includes("ip addr") || c === "ifconfig" || c === "ifconfig -a") {
+        return {
+          output: "1: lo: <LOOPBACK,UP,LOWER_UP> inet 127.0.0.1/8\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n    link/ether 00:16:3e:7b:44:10\n    inet 192.168.1.10/24 brd 192.168.1.255 scope global eth0",
+          explanation: "**Question 6 du DS 2023-2024** : Affiche les propriétés des cartes réseau (adresses MAC, IPv4/IPv6, masque, état UP/DOWN)."
+        };
+      }
+
+      if (c.includes("netstat -i") || c.includes("ip -s link")) {
+        return {
+          output: "Kernel Interface table\nIface      MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg\neth0      1500   145820      0      0 0         98412      0      0      0 BMRU\nlo       65536     4210      0      0 0          4210      0      0      0 LRU",
+          explanation: "**Question 7 du DS 2023-2024** : `netstat -i` affiche les statistiques réseau (paquets reçus RX, transmis TX, erreurs) **par interface**."
+        };
+      }
+
+      if (c.includes("netstat -s")) {
+        return {
+          output: "Ip:\n    149020 total packets received\nTcp:\n    840 active connection openings\n    12 failed connection attempts\nUdp:\n    14200 packets received",
+          explanation: "**Exercice 1 (Q4 du DS 2025-2026)** : `netstat -s` affiche les statistiques globales par protocole. Attention : ajouter une IP derrière (`netstat -s 192.168.10.100`) est un piège car `-s` ne filtre pas par IP !"
+        };
+      }
+
+      if (c.includes("netstat") && c.includes("grep https")) {
+        return {
+          output: "(Aucune sortie affichée !)",
+          explanation: "**Piège de l'Exercice (Q7 du DS 2023-2024)** : Dans `netstat -tuna | grep https`, l'option `-n` force l'affichage numérique (`:443`) au lieu du nom de service (`https`). Du coup `grep https` ne trouve rien ! Il faut faire `netstat -tua | grep https` ou `netstat -tuna | grep :443`."
+        };
+      }
+
+      if (c.includes("netstat") || c.includes("ss -tulnp")) {
+        return {
+          output: "Active Internet connections (servers and established)\nProto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name\ntcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      842/sshd\ntcp        0      0 192.168.1.10:443        0.0.0.0:*               LISTEN      1120/nginx\ntcp        0      0 192.168.1.10:22         10.90.1.105:54312       ESTABLISHED 1904/sshd: admin\nudp        0      0 0.0.0.0:53              0.0.0.0:*                           710/systemd-resolve",
+          explanation: "**Question 6 du DS 2025-2026 & Question 8 du DS 2023-2024** : Affiche les connexions et services actifs TCP (`-t`) et UDP (`-u`), en format numérique (`-n`), toutes les connexions (`-a` ou `-l` pour écoute), avec le PID et le nom du processus (`-p`)."
+        };
+      }
+
+      if (c.includes("nmap -sp") || c.includes("nmap -sn")) {
+        return {
+          output: "Starting Nmap ( https://nmap.org )\nNmap scan report for 192.168.1.1\nHost is up (0.0020s latency).\nNmap scan report for 192.168.1.10\nHost is up (0.0011s latency).\nNmap done: 256 IP addresses (2 hosts up) scanned in 2.41 seconds",
+          explanation: "**Exercice (Q4 du DS 2023-2024)** : `nmap -sP 192.168.1.*` effectue un **Ping Scan** (découverte des machines allumées sur le sous-réseau sans scanner leurs ports)."
+        };
+      }
+
+      if (c.includes("nmap -o")) {
+        return {
+          output: "Starting Nmap...\nRunning: Linux 5.X|6.X\nOS CPE: cpe:/o:linux:linux_kernel:6.8\nOS details: Linux 6.8 (Ubuntu 24.04 LTS)",
+          explanation: "**Question 8/9 des DS** : `nmap -O <IP>` permet d'afficher à distance la version du système d'exploitation cible (*OS Fingerprinting*)."
+        };
+      }
+
+      if (c.includes("nmap")) {
+        return {
+          output: "Starting Nmap...\nPORT    STATE SERVICE\n21/tcp  open  ftp\n22/tcp  open  ssh\n80/tcp  open  http\n443/tcp open  https",
+          explanation: "**Exercice (Q3 des deux DS)** : `nmap -sS` réalise un scan furtif **TCP SYN** (*Stealth / Half-open scan*) pour identifier les ports TCP ouverts."
+        };
+      }
+
+      if (c.includes("tcpdump") && c.includes("file -r")) {
+        return {
+          output: "tcpdump: syntax error: cannot combine -i eth0 with -r, and filename must follow -r",
+          explanation: "**Piège de l'Exercice (Q8 du DS 2023-2024)** : `tcpdump -i eth0 file -r` est invalide car `-r` sert à lire un fichier existant (`tcpdump -r file`) et ne s'utilise pas avec `-i eth0`."
+        };
+      }
+
+      if (c.includes("tcpdump")) {
+        return {
+          output: "tcpdump: listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes\n14:38:01.104 IP 10.90.1.105.51244 > 192.168.1.10.443: Flags [S], seq 1928374, win 64240\n14:38:01.105 IP 192.168.1.10.443 > 10.90.1.105.51244: Flags [S.], seq 884712, ack 1928375\n4 packets captured",
+          explanation: "Capture les paquets réseau sur l'interface indiquée (`-i eth0`). L'option `-w` sauvegarde les paquets dans un fichier binaire pcap, et `| tee` affiche et sauvegarde le texte simultanément."
+        };
+      }
+
+      if (c.includes("lsof -i :8080")) {
+        return {
+          output: "COMMAND   PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME\njava     2419   tomcat   48u  IPv6  45912      0t0  TCP *:8080 (LISTEN)",
+          explanation: "**Question 10 du DS 2025-2026** : `lsof -i :8080` identifie immédiatement quel processus (ici `java` / PID 2419) écoute sur le port 8080."
+        };
+      }
+
+      if (c.includes("lsof")) {
+        return {
+          output: "COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF   NODE NAME\nbash    1240 root  cwd    DIR    8,2     4096      2 /root\nbash    1240 root    0u   CHR  136,0      0t0      3 /dev/pts/0\nbash    1240 root    3u  IPv4  39104      0t0    TCP 192.168.1.10:4444->10.0.0.99:9001 (ESTABLISHED)",
+          explanation: "**Question 9 du DS 2025-2026** : `lsof -p <PID>` liste tous les fichiers et connexions réseau ouverts par un processus (idéal pour débusquer une porte dérobée / backdoor)."
+        };
+      }
+
+      if (c.includes("ps -aux")) {
+        const proc = cmd.split("grep")[1] ? cmd.split("grep")[1].trim() : "daemon";
+        return {
+          output: `root      1492  0.2  1.4 1284004 58240 ?       Ssl  09:15   0:14 /usr/bin/${proc} -D\nroot      3812  0.0  0.0   6480  2140 pts/0    S+   14:39   0:00 grep --color=auto ${proc}`,
+          explanation: `Filtre la liste complète des processus actifs (\`ps -aux\`) pour vérifier si le service **${proc}** est en cours d'exécution.`
+        };
+      }
+
+      if (c.includes("netcat") || c.includes("nc ") || c.includes("telnet")) {
+        return {
+          output: "Trying 192.168.1.10...\nConnected to 192.168.1.10.\n220 ProFTPD 1.3.8 Server (FSEGN Server) [192.168.1.10]",
+          explanation: "**Exercice (Q2 & Q6 du DS 2023-2024)** : Ouvre une connexion TCP vers le port cible (23 = Telnet, 21 = FTP) permettant de tester l'ouverture du port et de récupérer la bannière du service (*Banner Grabbing*)."
+        };
+      }
+
+      if (c.includes("rlogin")) {
+        return {
+          output: "Password for test@linux: \nWelcome to Linux fsegn-srv 6.8.0\ntest@linux:~$ ",
+          explanation: "**Exercice (Q10 du DS 2023-2024)** : `rlogin -l test linux` ouvre une session distante interactive sur la machine `linux` avec l'utilisateur `test` (protocole obsolète non chiffré, utilise `~/.rhosts`)."
+        };
+      }
+
+      if (c.includes("rsh")) {
+        return {
+          output: "  PID TTY          TIME CMD\n 1042 ?        00:00:01 sshd\n 1185 ?        00:00:04 apache2",
+          explanation: "**Exercice (Q11 du DS 2023-2024)** : `rsh linux ps` exécute la commande `ps` à distance sur la machine `linux` sans ouvrir de session interactive."
+        };
+      }
+
+      if (c.includes("/var/log/auth.log")) {
+        return {
+          output: "Oct 14 14:21:09 fsegn sshd[4102]: Failed password for root from 185.220.101.4 port 49812 ssh2\nOct 14 14:21:11 fsegn sshd[4102]: Failed password for invalid user admin from 185.220.101.4 port 49812 ssh2\nOct 14 14:22:01 fsegn sshd[4150]: Accepted publickey for anis from 192.168.1.50 port 52100 ssh2",
+          explanation: "Le fichier `/var/log/auth.log` trace toutes les authentifications SSH et sudo. On y repère immédiatement les attaques par force brute (`Failed password`)."
+        };
+      }
+
+      if (c.includes("usermod -l")) {
+        return {
+          output: "usermod: compte verrouillé avec succès.",
+          explanation: "`sudo usermod -L <user>` verrouille le mot de passe du compte utilisateur sans supprimer ses fichiers."
+        };
+      }
+
+      if (c.includes("getent passwd")) {
+        return {
+          output: "root:x:0:0:root:/root:/bin/bash\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\nanis:x:1000:1000:Anis NAANAA:/home/anis:/bin/bash",
+          explanation: "Affiche la liste des comptes utilisateurs du système avec leur UID, GID, dossier personnel et shell."
+        };
+      }
+
+      if (c.includes("limits.conf")) {
+        return {
+          output: "username hard nproc 100\nusername soft nproc 50\n@group   hard rss   1024000\n*        hard nofile 4096",
+          explanation: "Protège la disponibilité du système contre la saturation des ressources (ex: *fork bomb* bloquée par `nproc`, mémoire RAM limitée par `rss`)."
+        };
+      }
+
+      if (c.includes("visudo")) {
+        return {
+          output: "# /etc/sudoers ouvert via visudo (vérification syntaxique active)\njohn ALL=(ALL) ALL\nadmin ALL=(ALL) NOPASSWD: ALL\nwebadmin ALL=(www-data) /etc/init.d/apache2 *",
+          explanation: "Toujours utiliser `visudo` pour modifier `/etc/sudoers` afin d'éviter toute erreur de syntaxe qui bloquerait l'accès `sudo`."
+        };
+      }
+
+      if (c.includes("access.conf") || c.includes("time.conf")) {
+        return {
+          output: "# /etc/security/access.conf\n+ : root : ALL\n+ : admin : 192.168.1.0/24\n- : ALL : ALL\n\n# /etc/security/time.conf\nsshd;*;admin;Wd0900-1700",
+          explanation: "`access.conf` filtre les connexions par IP/domaine/terminal (`+` autorise, `-` interdit) et `time.conf` restreint les horaires d'accès par service (ex: `Wd0900-1700` = en semaine de 9h à 17h)."
+        };
+      }
+
+      if (c.includes("uname")) {
+        return {
+          output: "Linux fsegn-sec-lab 6.8.0-45-generic #45-Ubuntu SMP PREEMPT_DYNAMIC x86_64 GNU/Linux",
+          explanation: "**Question 8/9 des DS** : Affiche la version complète du noyau Linux et de l'architecture du système local."
+        };
+      }
+
+      return {
+        output: `Commande exécutée : ${cmd}\n[Code de retour : 0 - Succès]`,
+        explanation: "Commande Linux valide prise en compte par le simulateur. Tape `help` pour voir toutes les commandes préprogrammées des 23 slides et des 2 DS."
+      };
+    }
+
+    // Initialisation au chargement
+    buildSidebarNav();
+    renderView();
+  </script>
+</body>
+</html>
